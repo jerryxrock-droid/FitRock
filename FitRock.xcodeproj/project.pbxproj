@@ -1,0 +1,501 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		09C45350C02C7FF86CE3ED5B /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B0A1D93FD4F6E148D8D5373 /* Workout.swift */; };
+		1493C566C3545CFC14955C89 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABE520D189BB8AAA6B8C7BF /* HapticManager.swift */; };
+		15E580C18E90FD0FD8D4BED3 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 0B27030F60CAEAB693832E83 /* SQLite */; };
+		15ED353B014B71F048EB6FDA /* WorkoutExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A767AD0FBFA24267914210 /* WorkoutExercise.swift */; };
+		2220D312186013FAC08637EE /* ExerciseSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80691668A9E01126FAC2607 /* ExerciseSet.swift */; };
+		24D04737A46029652FEF792C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7488DDE16031AE0301E2E9F /* Assets.xcassets */; };
+		31BCA7134F31CE264F02C9C6 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B29D33B00D7A1A37D3876A /* StatsView.swift */; };
+		3DD816BE62BAC676B069C8E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE8E7D892070590B4051CFE /* ContentView.swift */; };
+		3EEF5E430D75718FF3515E41 /* RecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BB442E4A1C5714B3947AF6 /* RecordViewModel.swift */; };
+		5484FD2CC9AEC912C5586864 /* FitRockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B994B862B58085AE8EB43EB /* FitRockApp.swift */; };
+		801A1234573D23B2A8010BDF /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BA854EF7B85829F2FA1A92 /* Exercise.swift */; };
+		82C2507A4D4695A71FAFCB0F /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F398DE7B7DC8D51E81EC93A /* HomeViewModel.swift */; };
+		96BBAF94BCD8029E56CF157B /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70CBC7D0A47E1018148A297 /* Enums.swift */; };
+		9A6C6A26CC07E9D96FE1A3EF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C735A0C4068F4C595463F8 /* HomeView.swift */; };
+		A2479357691777E454F86709 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6920727E2B891F1504C94F /* StatsViewModel.swift */; };
+		A4A02E9817DC20CB8E6DE179 /* ExerciseSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB1ABEC700E322AD977E310 /* ExerciseSearchView.swift */; };
+		A8E041F37AA05188FF64237F /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39B129C7B92DCDCFF32E52E /* WorkoutSummaryView.swift */; };
+		C097849E9DEC24312EB87932 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7915A04B06CBBFD074F8BB37 /* Theme.swift */; };
+		CAA5B9687710DBFBA21353F5 /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547941FE44A1EC3BA6623B57 /* RecordView.swift */; };
+		EBC025172110DB1A794EA890 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9580E21705E3A554E58D0296 /* DatabaseManager.swift */; };
+		F4A5586CF74B68AB93F8D05B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDB3F5D1CB4B0DB8B8BA2D8 /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0B994B862B58085AE8EB43EB /* FitRockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitRockApp.swift; sourceTree = "<group>"; };
+		17BA854EF7B85829F2FA1A92 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
+		3AB1ABEC700E322AD977E310 /* ExerciseSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSearchView.swift; sourceTree = "<group>"; };
+		3B0A1D93FD4F6E148D8D5373 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
+		3F398DE7B7DC8D51E81EC93A /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		547941FE44A1EC3BA6623B57 /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
+		58688B5A5C9593624135E7E5 /* FitRock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitRock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C6920727E2B891F1504C94F /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
+		5CDB3F5D1CB4B0DB8B8BA2D8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		64BB442E4A1C5714B3947AF6 /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewModel.swift; sourceTree = "<group>"; };
+		6FE8E7D892070590B4051CFE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		7915A04B06CBBFD074F8BB37 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		80C735A0C4068F4C595463F8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		8ABE520D189BB8AAA6B8C7BF /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		9580E21705E3A554E58D0296 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		A80691668A9E01126FAC2607 /* ExerciseSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSet.swift; sourceTree = "<group>"; };
+		A9B29D33B00D7A1A37D3876A /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		C39B129C7B92DCDCFF32E52E /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
+		D9A767AD0FBFA24267914210 /* WorkoutExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExercise.swift; sourceTree = "<group>"; };
+		E70CBC7D0A47E1018148A297 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		F7488DDE16031AE0301E2E9F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8C7690C4F3DB989920497E74 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				15E580C18E90FD0FD8D4BED3 /* SQLite in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0DF6192F800E5D1838288DBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				58688B5A5C9593624135E7E5 /* FitRock.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		35AA1156FD11143AEF751CF8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				8ABE520D189BB8AAA6B8C7BF /* HapticManager.swift */,
+				7915A04B06CBBFD074F8BB37 /* Theme.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		35B51E6BA105A7CE7244818B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6FE8E7D892070590B4051CFE /* ContentView.swift */,
+				0B994B862B58085AE8EB43EB /* FitRockApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		55569B0062C3AC3901BD3B7D /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				80C735A0C4068F4C595463F8 /* HomeView.swift */,
+				3F398DE7B7DC8D51E81EC93A /* HomeViewModel.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		60895602B961746B4E4431C1 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				9580E21705E3A554E58D0296 /* DatabaseManager.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		6AA737A045A70D567931715B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F7488DDE16031AE0301E2E9F /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		83E5EA56676EFE99963A8996 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				5CDB3F5D1CB4B0DB8B8BA2D8 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		9344EDB16925D80826BC5D40 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E70CBC7D0A47E1018148A297 /* Enums.swift */,
+				17BA854EF7B85829F2FA1A92 /* Exercise.swift */,
+				A80691668A9E01126FAC2607 /* ExerciseSet.swift */,
+				3B0A1D93FD4F6E148D8D5373 /* Workout.swift */,
+				D9A767AD0FBFA24267914210 /* WorkoutExercise.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A020E1F7730FD16FBFAB466A /* FitRock */ = {
+			isa = PBXGroup;
+			children = (
+				35B51E6BA105A7CE7244818B /* App */,
+				C65FC8DCA6C426A568F5EFD7 /* Core */,
+				F197BF821F59DB8A36C00452 /* Features */,
+				6AA737A045A70D567931715B /* Resources */,
+				35AA1156FD11143AEF751CF8 /* Shared */,
+			);
+			path = FitRock;
+			sourceTree = "<group>";
+		};
+		B7F506ED4F116C2D8E09E931 = {
+			isa = PBXGroup;
+			children = (
+				A020E1F7730FD16FBFAB466A /* FitRock */,
+				0DF6192F800E5D1838288DBB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C65FC8DCA6C426A568F5EFD7 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				60895602B961746B4E4431C1 /* Database */,
+				9344EDB16925D80826BC5D40 /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		E2186226AEC3434E421A118D /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				A9B29D33B00D7A1A37D3876A /* StatsView.swift */,
+				5C6920727E2B891F1504C94F /* StatsViewModel.swift */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
+		E74DED538766EC2371F98B0A /* Record */ = {
+			isa = PBXGroup;
+			children = (
+				3AB1ABEC700E322AD977E310 /* ExerciseSearchView.swift */,
+				547941FE44A1EC3BA6623B57 /* RecordView.swift */,
+				64BB442E4A1C5714B3947AF6 /* RecordViewModel.swift */,
+				C39B129C7B92DCDCFF32E52E /* WorkoutSummaryView.swift */,
+			);
+			path = Record;
+			sourceTree = "<group>";
+		};
+		F197BF821F59DB8A36C00452 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				55569B0062C3AC3901BD3B7D /* Home */,
+				E74DED538766EC2371F98B0A /* Record */,
+				83E5EA56676EFE99963A8996 /* Settings */,
+				E2186226AEC3434E421A118D /* Stats */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C13FA49826EEA12A8B3BC54F /* FitRock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 161CF0119096F167982D0981 /* Build configuration list for PBXNativeTarget "FitRock" */;
+			buildPhases = (
+				B58A5524C325E71A25043F1D /* Sources */,
+				0EBFFA33396705919F6F94DB /* Resources */,
+				8C7690C4F3DB989920497E74 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FitRock;
+			packageProductDependencies = (
+				0B27030F60CAEAB693832E83 /* SQLite */,
+			);
+			productName = FitRock;
+			productReference = 58688B5A5C9593624135E7E5 /* FitRock.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6CD3FD97BFA06B655F60E964 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 14D311EA834F00C88F17E5A0 /* Build configuration list for PBXProject "FitRock" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B7F506ED4F116C2D8E09E931;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C13FA49826EEA12A8B3BC54F /* FitRock */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0EBFFA33396705919F6F94DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24D04737A46029652FEF792C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B58A5524C325E71A25043F1D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DD816BE62BAC676B069C8E9 /* ContentView.swift in Sources */,
+				EBC025172110DB1A794EA890 /* DatabaseManager.swift in Sources */,
+				96BBAF94BCD8029E56CF157B /* Enums.swift in Sources */,
+				801A1234573D23B2A8010BDF /* Exercise.swift in Sources */,
+				A4A02E9817DC20CB8E6DE179 /* ExerciseSearchView.swift in Sources */,
+				2220D312186013FAC08637EE /* ExerciseSet.swift in Sources */,
+				5484FD2CC9AEC912C5586864 /* FitRockApp.swift in Sources */,
+				1493C566C3545CFC14955C89 /* HapticManager.swift in Sources */,
+				9A6C6A26CC07E9D96FE1A3EF /* HomeView.swift in Sources */,
+				82C2507A4D4695A71FAFCB0F /* HomeViewModel.swift in Sources */,
+				CAA5B9687710DBFBA21353F5 /* RecordView.swift in Sources */,
+				3EEF5E430D75718FF3515E41 /* RecordViewModel.swift in Sources */,
+				F4A5586CF74B68AB93F8D05B /* SettingsView.swift in Sources */,
+				31BCA7134F31CE264F02C9C6 /* StatsView.swift in Sources */,
+				A2479357691777E454F86709 /* StatsViewModel.swift in Sources */,
+				C097849E9DEC24312EB87932 /* Theme.swift in Sources */,
+				09C45350C02C7FF86CE3ED5B /* Workout.swift in Sources */,
+				15ED353B014B71F048EB6FDA /* WorkoutExercise.swift in Sources */,
+				A8E041F37AA05188FF64237F /* WorkoutSummaryView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9A3E3F1798E287932820E94B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B164A18D92C1D7221BF79D9D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitrock.FitRock;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B9D6680563D28899571E5C7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitrock.FitRock;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EBC8CBF2259E42AFA5A65A6F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		14D311EA834F00C88F17E5A0 /* Build configuration list for PBXProject "FitRock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A3E3F1798E287932820E94B /* Debug */,
+				EBC8CBF2259E42AFA5A65A6F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		161CF0119096F167982D0981 /* Build configuration list for PBXNativeTarget "FitRock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9D6680563D28899571E5C7C /* Debug */,
+				B164A18D92C1D7221BF79D9D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0B27030F60CAEAB693832E83 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6CD3FD97BFA06B655F60E964 /* Project object */;
+}

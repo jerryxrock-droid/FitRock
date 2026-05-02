@@ -1,0 +1,35 @@
+name: FitRock
+options:
+  bundleIdPrefix: com.fitrock
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+    INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+
+packages:
+  SQLite:
+    url: https://github.com/stephencelis/SQLite.swift
+    from: "0.15.0"
+
+targets:
+  FitRock:
+    type: application
+    platform: iOS
+    sources:
+      - FitRock
+    dependencies:
+      - package: SQLite
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fitrock.FitRock
+        INFOPLIST_KEY_CFBundleDisplayName: FitRock
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
