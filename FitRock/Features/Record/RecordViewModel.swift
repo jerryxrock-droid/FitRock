@@ -92,6 +92,22 @@ final class RecordViewModel: ObservableObject {
         Haptic.success.trigger()
     }
 
+    func cancelWorkout() {
+        stopTimer()
+
+        if let workout = currentWorkout {
+            try? db.deleteWorkout(workout.id)
+        }
+
+        currentWorkout = nil
+        isWorkoutActive = false
+        workoutExercises = []
+        expandedIds = []
+        workoutStartTime = nil
+
+        Haptic.medium.trigger()
+    }
+
     func addExercise(_ exercise: Exercise) {
         guard var workout = currentWorkout else { return }
 

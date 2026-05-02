@@ -8,6 +8,9 @@ struct RecordView: View {
     @State private var showEmptyAlert = false
     @State private var showDiscardAlert = false
     @State private var pendingDiscardAction: (() -> Void)?
+    @State private var showCountdown = false
+    @State private var showCompletionRing = false
+    @State private var showCancelAlert = false
 
     var body: some View {
         NavigationStack {
@@ -19,21 +22,52 @@ struct RecordView: View {
                 } else {
                     emptyStateView
                 }
+
+                // Countdown overlay
+                if showCountdown {
+                    CountdownView(onComplete: {
+                        showCountdown = false
+                        viewModel.startWorkout()
+                    })
+                }
+
+                // Completion ring overlay
+                if showCompletionRing {
+                    CompletionRingView(onComplete: {
+                        showCompletionRing = false
+                        showSummary = true
+                    })
+                }
             }
             .navigationTitle("训练")
             .toolbar {
                 if viewModel.isWorkoutActive {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("取消") {
+                            showCancelAlert = true
+                        }
+                        .foregroundColor(Theme.Colors.error)
+                    }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("结束") {
                             if viewModel.totalSets == 0 {
                                 showEmptyAlert = true
                             } else {
-                                showSummary = true
+                                showCompletionRing = true
                             }
                         }
                         .foregroundColor(Theme.Colors.accent)
                     }
                 }
+            }
+            .alert("确认取消训练", isPresented: $showCancelAlert) {
+                Button("继续训练", role: .cancel) { }
+                Button("取消训练", role: .destructive) {
+                    viewModel.cancelWorkout()
+                    appState.discardUnfinishedWorkout()
+                }
+            } message: {
+                Text("确定要取消当前训练吗？所有记录将被删除。")
             }
             .sheet(isPresented: $showExerciseSearch) {
                 ExerciseSearchView(onSelect: { exercise in
@@ -136,7 +170,9 @@ struct RecordView: View {
                     .font(Theme.Fonts.body)
                     .foregroundColor(Theme.Colors.textMuted)
 
-                Button { viewModel.startWorkout() } label: {
+                Button {
+                    showCountdown = true
+                } label: {
                     HStack {
                         Image(systemName: "plus.circle.fill")
                         Text("开始训练")
@@ -239,6 +275,141 @@ struct RecordView: View {
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
                     .foregroundColor(Theme.Colors.accent.opacity(0.5))
             )
+        }
+    }
+}
+
+// MARK: - CountdownView
+struct CountdownView: View {
+    let onComplete: () -> Void
+
+    @State private var countdownNumber = 3
+    @State private var isActive = false
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.85)
+                .ignoresSafeArea()
+                .transition(.opacity)
+
+            VStack(spacing: 20) {
+                Text("准备开始")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textMuted)
+
+                ZStack {
+                    Text("\(countdownNumber)")
+                        .font(.system(size: 120, weight: .bold, design: .rounded))
+                        .foregroundColor(Theme.Colors.accent)
+                        .opacity(isActive ? 1 : 0)
+                        .scaleEffect(isActive ? 1 : 0.5)
+                }
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+            }
+        }
+        .onAppear {
+            startCountdown()
+        }
+    }
+
+    private func startCountdown() {
+        isActive = true
+
+        // 3 -> 2 -> 1 -> 0 (GO)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            countdownNumber = 2
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+            countdownNumber = 1
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) {
+            countdownNumber = 0
+        }
+
+        // Fade out and complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
+            withAnimation(.easeOut(duration: 0.25)) {
+                isActive = false
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
+            onComplete()
+        }
+    }
+}
+
+// MARK: - CompletionRingView
+struct CompletionRingView: View {
+    let onComplete: () -> Void
+
+    @State private var progress: CGFloat = 0
+    @State private var ringOpacity: Double = 1
+    @State private var checkmarkScale: CGFloat = 0
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+
+            VStack(spacing: 30) {
+                ZStack {
+                    // Background ring
+                    Circle()
+                        .stroke(Theme.Colors.surface, lineWidth: 12)
+                        .frame(width: 150, height: 150)
+
+                    // Progress ring
+                    Circle()
+                        .trim(from: 0, to: progress)
+                        .stroke(
+                            Theme.Colors.accent,
+                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                        )
+                        .frame(width: 150, height: 150)
+                        .rotationEffect(.degrees(-90))
+
+                    // Checkmark
+                    if progress >= 1 {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 60, weight: .bold))
+                            .foregroundColor(Theme.Colors.success)
+                            .scaleEffect(checkmarkScale)
+                    }
+                }
+
+                Text("保存中...")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textSecondary)
+                    .opacity(ringOpacity)
+            }
+        }
+        .onAppear {
+            animateRing()
+        }
+    }
+
+    private func animateRing() {
+        // Animate ring filling up
+        withAnimation(.easeInOut(duration: 0.8)) {
+            progress = 1
+        }
+
+        // Show checkmark
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                checkmarkScale = 1
+            }
+        }
+
+        // Complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.easeOut(duration: 0.3)) {
+                ringOpacity = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+                onComplete()
+            }
         }
     }
 }
