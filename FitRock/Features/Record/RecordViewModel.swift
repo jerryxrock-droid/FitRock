@@ -53,7 +53,12 @@ final class RecordViewModel: ObservableObject {
             try db.connect()
             workoutExercises = try workout.exercises.map { we in
                 let lastSets = try db.getLastWorkoutSets(for: we.exerciseId)
-                return WorkoutExerciseDisplay(from: we, lastSets: lastSets.map { ExerciseSetDisplay(from: $0) })
+                let exercise = try db.getExercise(by: we.exerciseId)
+                return WorkoutExerciseDisplay(
+                    from: we,
+                    lastSets: lastSets.map { ExerciseSetDisplay(from: $0) },
+                    unit: exercise?.unit ?? .weight
+                )
             }
         } catch {
             print("Error resuming workout: \(error)")
@@ -147,12 +152,48 @@ final class RecordViewModel: ObservableObject {
         loadWorkoutExercises()
     }
 
+    func updateExerciseName(_ workoutExercise: WorkoutExerciseDisplay, newName: String) {
+        guard var workout = currentWorkout,
+              let index = workout.exercises.firstIndex(where: { $0.id == workoutExercise.id }) else { return }
+
+        workout.exercises[index].exerciseName = newName
+        currentWorkout = workout
+
+        do {
+            try db.connect()
+            try db.saveWorkout(workout)
+        } catch {
+            print("Error updating exercise name: \(error)")
+        }
+
+        loadWorkoutExercises()
+    }
+
+    func saveAsUserExercise(name: String, bodyPart: BodyPart) {
+        do {
+            try db.connect()
+            try db.saveUserExercise(name: name, bodyPart: bodyPart)
+            Haptic.success.trigger()
+        } catch {
+            print("Error saving user exercise: \(error)")
+        }
+    }
+
     func addSet(to workoutExercise: WorkoutExerciseDisplay) {
         guard var workout = currentWorkout,
               let index = workout.exercises.firstIndex(where: { $0.id == workoutExercise.id }) else { return }
 
         let lastSetNumber = workout.exercises[index].sets.count + 1
-        let newSet = ExerciseSet(setNumber: lastSetNumber)
+
+        // Pre-fill with last workout's values if available
+        var defaultWeight: Double = 0
+        var defaultReps: Int = 0
+        if let lastSet = workoutExercise.lastSets?.last {
+            defaultWeight = lastSet.weight
+            defaultReps = lastSet.reps
+        }
+
+        let newSet = ExerciseSet(setNumber: lastSetNumber, weight: defaultWeight, reps: defaultReps)
 
         workout.exercises[index].sets.append(newSet)
         currentWorkout = workout
@@ -251,7 +292,12 @@ final class RecordViewModel: ObservableObject {
             try db.connect()
             workoutExercises = try workout.exercises.map { we in
                 let lastSets = try db.getLastWorkoutSets(for: we.exerciseId)
-                return WorkoutExerciseDisplay(from: we, lastSets: lastSets.map { ExerciseSetDisplay(from: $0) })
+                let exercise = try db.getExercise(by: we.exerciseId)
+                return WorkoutExerciseDisplay(
+                    from: we,
+                    lastSets: lastSets.map { ExerciseSetDisplay(from: $0) },
+                    unit: exercise?.unit ?? .weight
+                )
             }
         } catch {
             print("Error loading workout exercises: \(error)")

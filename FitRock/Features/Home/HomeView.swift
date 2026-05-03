@@ -37,7 +37,7 @@ struct HomeView: View {
         HStack(spacing: Theme.Spacing.md) {
             StatCard(title: "本月训练", value: "\(viewModel.monthWorkoutCount)", icon: "figure.run")
             StatCard(title: "连续打卡", value: "\(viewModel.streakDays)", icon: "flame")
-            StatCard(title: "总容量", value: "\(Int(viewModel.monthVolume))t", icon: "scalemass")
+            StatCard(title: "平均单次", value: String(format: "%.1f", viewModel.monthWorkoutCount > 0 ? viewModel.monthVolume / Double(viewModel.monthWorkoutCount) / 1000 : 0.0) + "T", icon: "scalemass")
         }
     }
 
@@ -69,7 +69,7 @@ struct HomeView: View {
             }
 
             LazyVGrid(columns: columns, spacing: Theme.Spacing.sm) {
-                ForEach(daysInMonth, id: \.self) { date in
+                ForEach(Array(daysInMonth.enumerated()), id: \.offset) { index, date in
                     if let date = date {
                         CalendarDayView(
                             date: date,
@@ -87,7 +87,7 @@ struct HomeView: View {
                             }
                         )
                     } else {
-                        Color.clear.frame(height: 40)
+                        Color.clear.id("placeholder-" + String(index))
                     }
                 }
             }
@@ -254,6 +254,15 @@ struct WorkoutSummaryCard: View {
                 .font(Theme.Fonts.caption)
                 .foregroundColor(Theme.Colors.textMuted)
                 .lineLimit(2)
+
+            HStack(spacing: Theme.Spacing.md) {
+                Label(String(format: "%.1f", Double(workout.totalVolume) / 1000) + "T", systemImage: "scalemass")
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(Theme.Colors.textSecondary)
+                Label("\(workout.totalSets)组", systemImage: "number")
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(Theme.Colors.textSecondary)
+            }
         }
         .padding()
         .background(Theme.Colors.surface2)

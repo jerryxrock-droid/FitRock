@@ -3,7 +3,7 @@ import Foundation
 struct WorkoutExercise: Identifiable, Codable {
     let id: String
     let exerciseId: String
-    let exerciseName: String
+    var exerciseName: String
     let bodyPart: BodyPart
     var sets: [ExerciseSet]
 
@@ -21,14 +21,16 @@ struct WorkoutExerciseDisplay: Identifiable {
     let exerciseId: String
     let exerciseName: String
     let bodyPart: BodyPart
+    let unit: ExerciseUnit
     let sets: [ExerciseSetDisplay]
     let lastSets: [ExerciseSetDisplay]?
 
-    init(from workoutExercise: WorkoutExercise, lastSets: [ExerciseSetDisplay]? = nil) {
+    init(from workoutExercise: WorkoutExercise, lastSets: [ExerciseSetDisplay]? = nil, unit: ExerciseUnit = .weight) {
         self.id = workoutExercise.id
         self.exerciseId = workoutExercise.exerciseId
         self.exerciseName = workoutExercise.exerciseName
         self.bodyPart = workoutExercise.bodyPart
+        self.unit = unit
         self.sets = workoutExercise.sets.map { ExerciseSetDisplay(from: $0) }
         self.lastSets = lastSets
     }

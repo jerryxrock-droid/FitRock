@@ -15,3 +15,17 @@ enum ExerciseSetType: String, Codable {
     case warmup
     case dropSet
 }
+
+enum ExerciseUnit: String, Codable, CaseIterable {
+    case weight  // kg
+    case reps    // 次数
+    case duration // 分钟
+
+    var displayName: String {
+        switch self {
+        case .weight: return "kg"
+        case .reps: return "次"
+        case .duration: return "分钟"
+        }
+    }
+}

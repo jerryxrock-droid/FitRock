@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -37,7 +37,7 @@
 		3B0A1D93FD4F6E148D8D5373 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		3F398DE7B7DC8D51E81EC93A /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		547941FE44A1EC3BA6623B57 /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
-		58688B5A5C9593624135E7E5 /* FitRock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitRock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58688B5A5C9593624135E7E5 /* FitRock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitRock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C6920727E2B891F1504C94F /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
 		5CDB3F5D1CB4B0DB8B8BA2D8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		64BB442E4A1C5714B3947AF6 /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewModel.swift; sourceTree = "<group>"; };
@@ -240,9 +240,8 @@
 			mainGroup = B7F506ED4F116C2D8E09E931;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -366,6 +365,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9W9DQ54BVY;
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -383,6 +383,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9W9DQ54BVY;
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -479,7 +480,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+		059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
 			requirement = {
@@ -492,7 +493,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0B27030F60CAEAB693832E83 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			package = 059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */

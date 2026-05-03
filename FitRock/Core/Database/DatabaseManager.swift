@@ -39,6 +39,8 @@ final class DatabaseManager {
     private let colExName = SQLite.Expression<String>("exercise_name")
     private let colExBodyPart = SQLite.Expression<String>("body_part")
     private let colExDescription = SQLite.Expression<String>("description")
+    private let colExIsUserCreated = SQLite.Expression<Bool>("is_user_created")
+    private let colExUnit = SQLite.Expression<String>("unit")
 
     private init() {}
 
@@ -48,6 +50,32 @@ final class DatabaseManager {
         db = try Connection(dbPath)
         try createTables()
         try seedExercises()
+        try migrateSchemaIfNeeded()
+    }
+
+    private func migrateSchemaIfNeeded() throws {
+        guard let db = db else { return }
+
+        let tableInfo = try db.prepare("PRAGMA table_info(exercises)")
+        var hasIsUserCreated = false
+        var hasUnit = false
+        for row in tableInfo {
+            if row[1] as? String == "is_user_created" {
+                hasIsUserCreated = true
+            }
+            if row[1] as? String == "unit" {
+                hasUnit = true
+            }
+        }
+
+        if !hasIsUserCreated {
+            try db.run("ALTER TABLE exercises ADD COLUMN is_user_created INTEGER DEFAULT 0")
+        }
+        if !hasUnit {
+            try db.run("ALTER TABLE exercises ADD COLUMN unit TEXT DEFAULT 'weight'")
+        }
+        // Migrate existing exercises with NULL unit to default weight
+        try db.run("UPDATE exercises SET unit = 'weight' WHERE unit IS NULL")
     }
 
     private func createTables() throws {
@@ -83,6 +111,8 @@ final class DatabaseManager {
             t.column(colExName)
             t.column(colExBodyPart)
             t.column(colExDescription)
+            t.column(colExIsUserCreated)
+            t.column(colExUnit)
         })
     }
 
@@ -268,50 +298,97 @@ final class DatabaseManager {
                 id: row[colExId],
                 name: row[colExName],
                 bodyPart: BodyPart(rawValue: row[colExBodyPart]) ?? .chest,
-                description: row[colExDescription]
+                description: row[colExDescription],
+                isUserCreated: row[colExIsUserCreated],
+                unit: ExerciseUnit(rawValue: row[colExUnit]) ?? .weight
             )
             result.append(ex)
         }
         return result
     }
 
+    func getExercise(by id: String) throws -> Exercise? {
+        guard let db = db else { return nil }
+        let query = exercises.filter(colExId == id)
+        guard let row = try db.pluck(query) else { return nil }
+        return Exercise(
+            id: row[colExId],
+            name: row[colExName],
+            bodyPart: BodyPart(rawValue: row[colExBodyPart]) ?? .chest,
+            description: row[colExDescription],
+            isUserCreated: row[colExIsUserCreated],
+            unit: ExerciseUnit(rawValue: row[colExUnit]) ?? .weight
+        )
+    }
+
+    func saveUserExercise(name: String, bodyPart: BodyPart, unit: ExerciseUnit = .weight) throws {
+        guard let db = db else { return }
+
+        let insert = exercises.insert(
+            colExId <- UUID().uuidString,
+            colExName <- name,
+            colExBodyPart <- bodyPart.rawValue,
+            colExDescription <- "",
+            colExIsUserCreated <- true,
+            colExUnit <- unit.rawValue
+        )
+        try db.run(insert)
+    }
+
+    func deleteExercise(_ exerciseId: String) throws {
+        guard let db = db else { return }
+        try db.run(exercises.filter(colExId == exerciseId).delete())
+    }
+
     func seedExercises() throws {
         guard let db = db else { return }
 
         let count = try db.scalar(exercises.count)
-        if count > 0 { return }
+        if count > 0 {
+            // Update existing exercises' unit values
+            try updateExerciseUnits(db)
+            return
+        }
 
-        let defaultExercises: [(String, String, String)] = [
-            ("杠铃卧推", "chest", "主要锻炼胸部肌肉"),
-            ("哑铃卧推", "chest", "锻炼胸部肌肉"),
-            ("双杠臂屈伸", "chest", "锻炼下胸部和肱三头肌"),
-            ("哑铃飞鸟", "chest", "锻炼胸大肌"),
-            ("高位下拉", "back", "锻炼背阔肌"),
-            ("坐姿划船", "back", "锻炼背部肌肉"),
-            ("引体向上", "back", "锻炼背阔肌和肱二头肌"),
-            ("直臂下压", "back", "锻炼背阔肌"),
-            ("杠铃推举", "shoulders", "锻炼肩部肌肉"),
-            ("哑铃侧平举", "shoulders", "锻炼三角肌中束"),
-            ("前平举", "shoulders", "锻炼三角肌前束"),
-            ("俯身飞鸟", "shoulders", "锻炼三角肌后束"),
-            ("杠铃弯举", "arms", "锻炼肱二头肌"),
-            ("哑铃弯举", "arms", "锻炼肱二头肌"),
-            ("锤式弯举", "arms", "锻炼肱肌和肱二头肌"),
-            ("窄距卧推", "arms", "锻炼肱三头肌"),
-            ("绳索下压", "arms", "锻炼肱三头肌"),
-            ("过顶伸展", "arms", "锻炼肱三头肌"),
-            ("深蹲", "legs", "锻炼大腿和臀部肌肉"),
-            ("腿举", "legs", "锻炼大腿肌肉"),
-            ("腿弯举", "legs", "锻炼腘绳肌"),
-            ("腿伸展", "legs", "锻炼股四头肌"),
-            ("罗马尼亚硬拉", "legs", "锻炼臀部和腘绳肌"),
-            ("小腿提踵", "legs", "锻炼小腿肌肉"),
-            ("卷腹", "core", "锻炼腹肌"),
-            ("平板支撑", "core", "锻炼核心肌群"),
-            ("悬垂举腿", "core", "锻炼下腹部"),
-            ("俄语转体", "core", "锻炼腹斜肌"),
-            ("山羊挺身", "core", "锻炼下背部和臀部"),
-            ("跑步机", "cardio", "有氧运动"),
+        // (name, bodyPart, description, unit)
+        let defaultExercises: [(String, String, String, String)] = [
+            // 胸部 - 重量类
+            ("杠铃卧推", "chest", "主要锻炼胸部肌肉", "weight"),
+            ("哑铃卧推", "chest", "锻炼胸部肌肉", "weight"),
+            ("双杠臂屈伸", "chest", "锻炼下胸部和肱三头肌", "weight"),
+            ("哑铃飞鸟", "chest", "锻炼胸大肌", "weight"),
+            // 背部 - 重量类
+            ("高位下拉", "back", "锻炼背阔肌", "weight"),
+            ("坐姿划船", "back", "锻炼背部肌肉", "weight"),
+            ("引体向上", "back", "锻炼背阔肌和肱二头肌", "reps"),
+            ("直臂下压", "back", "锻炼背阔肌", "weight"),
+            // 肩部 - 重量类
+            ("杠铃推举", "shoulders", "锻炼肩部肌肉", "weight"),
+            ("哑铃侧平举", "shoulders", "锻炼三角肌中束", "weight"),
+            ("前平举", "shoulders", "锻炼三角肌前束", "weight"),
+            ("俯身飞鸟", "shoulders", "锻炼三角肌后束", "weight"),
+            // 手臂 - 重量类
+            ("杠铃弯举", "arms", "锻炼肱二头肌", "weight"),
+            ("哑铃弯举", "arms", "锻炼肱二头肌", "weight"),
+            ("锤式弯举", "arms", "锻炼肱肌和肱二头肌", "weight"),
+            ("窄距卧推", "arms", "锻炼肱三头肌", "weight"),
+            ("绳索下压", "arms", "锻炼肱三头肌", "weight"),
+            ("过顶伸展", "arms", "锻炼肱三头肌", "weight"),
+            // 腿部 - 重量类
+            ("深蹲", "legs", "锻炼大腿和臀部肌肉", "weight"),
+            ("腿举", "legs", "锻炼大腿肌肉", "weight"),
+            ("腿弯举", "legs", "锻炼腘绳肌", "weight"),
+            ("腿伸展", "legs", "锻炼股四头肌", "weight"),
+            ("罗马尼亚硬拉", "legs", "锻炼臀部和腘绳肌", "weight"),
+            ("小腿提踵", "legs", "锻炼小腿肌肉", "weight"),
+            // 核心 - 次数/时长类
+            ("卷腹", "core", "锻炼腹肌", "reps"),
+            ("平板支撑", "core", "锻炼核心肌群", "duration"),
+            ("悬垂举腿", "core", "锻炼下腹部", "reps"),
+            ("俄语转体", "core", "锻炼腹斜肌", "reps"),
+            ("山羊挺身", "core", "锻炼下背部和臀部", "duration"),
+            // 有氧 - 时长类
+            ("跑步机", "cardio", "有氧运动", "duration"),
         ]
 
         for ex in defaultExercises {
@@ -319,9 +396,28 @@ final class DatabaseManager {
                 colExId <- UUID().uuidString,
                 colExName <- ex.0,
                 colExBodyPart <- ex.1,
-                colExDescription <- ex.2
+                colExDescription <- ex.2,
+                colExIsUserCreated <- false,
+                colExUnit <- ex.3
             )
             try db.run(insert)
+        }
+    }
+
+    private func updateExerciseUnits(_ db: Connection) throws {
+        // Map exercise names to their correct units
+        let exerciseUnits: [String: String] = [
+            "引体向上": "reps",
+            "卷腹": "reps",
+            "平板支撑": "duration",
+            "悬垂举腿": "reps",
+            "俄语转体": "reps",
+            "山羊挺身": "duration",
+            "跑步机": "duration"
+        ]
+
+        for (name, unit) in exerciseUnits {
+            try db.run(exercises.filter(colExName == name).update(colExUnit <- unit))
         }
     }
 }

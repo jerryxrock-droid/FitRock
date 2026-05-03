@@ -11,6 +11,7 @@ struct RecordView: View {
     @State private var showCountdown = false
     @State private var showCompletionRing = false
     @State private var showCancelAlert = false
+    @State private var showWorkoutRecovery = false
 
     var body: some View {
         NavigationStack {
@@ -99,9 +100,25 @@ struct RecordView: View {
                 Text("确定要删除这个动作吗？")
             }
             .onAppear {
-                if appState.shouldResumeWorkout, let workout = appState.unfinishedWorkout {
-                    viewModel.resumeWorkout(from: workout)
+                if appState.shouldResumeWorkout, appState.unfinishedWorkout != nil {
+                    showWorkoutRecovery = true
                     appState.shouldResumeWorkout = false
+                }
+            }
+            .overlay {
+                if showWorkoutRecovery, let workout = appState.unfinishedWorkout {
+                    WorkoutRecoveryView(
+                        workout: workout,
+                        onResume: {
+                            viewModel.resumeWorkout(from: workout)
+                            showWorkoutRecovery = false
+                        },
+                        onDiscard: {
+                            appState.discardUnfinishedWorkout()
+                            showWorkoutRecovery = false
+                        }
+                    )
+                    .transition(.opacity)
                 }
             }
         }
@@ -173,16 +190,13 @@ struct RecordView: View {
                 Button {
                     showCountdown = true
                 } label: {
-                    HStack {
-                        Image(systemName: "plus.circle.fill")
-                        Text("开始训练")
-                    }
-                    .font(Theme.Fonts.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Theme.Colors.accent)
-                    .cornerRadius(Theme.CornerRadius.medium)
+                    Text("开始训练")
+                        .font(Theme.Fonts.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Theme.Colors.accent)
+                        .cornerRadius(Theme.CornerRadius.medium)
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
 
@@ -426,35 +440,45 @@ struct ExerciseCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Button(action: onToggleExpand) {
-                HStack {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(Theme.Colors.textMuted)
+            HStack {
+                Button(action: onToggleExpand) {
+                    HStack {
+                        Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(Theme.Colors.textMuted)
 
-                    VStack(alignment: .leading) {
-                        Text(workoutExercise.exerciseName)
-                            .font(Theme.Fonts.headline)
-                            .foregroundColor(Theme.Colors.textPrimary)
-                        Text(workoutExercise.bodyPart.displayName)
-                            .font(Theme.Fonts.caption)
-                            .foregroundColor(workoutExercise.bodyPart.themeColor)
+                        VStack(alignment: .leading) {
+                            Text(workoutExercise.exerciseName)
+                                .font(Theme.Fonts.headline)
+                                .foregroundColor(Theme.Colors.textPrimary)
+                            Text(workoutExercise.bodyPart.displayName)
+                                .font(Theme.Fonts.caption)
+                                .foregroundColor(workoutExercise.bodyPart.themeColor)
 
-                        if !isExpanded, let lastSets = workoutExercise.lastSets, !lastSets.isEmpty {
-                            Text("上次: \(formatLastSets(lastSets))")
-                                .font(.system(size: 11))
-                                .foregroundColor(Theme.Colors.textMuted)
+                            if !isExpanded, let lastSets = workoutExercise.lastSets, !lastSets.isEmpty {
+                                Text("上次: \(formatLastSets(lastSets))")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Theme.Colors.textMuted)
+                            }
                         }
                     }
+                }
+                .buttonStyle(.plain)
 
-                    Spacer()
+                Spacer()
 
+                HStack(spacing: Theme.Spacing.md) {
                     Text("\(workoutExercise.sets.count) 组")
                         .font(Theme.Fonts.caption)
                         .foregroundColor(Theme.Colors.textMuted)
+
+                    Button(action: onRequestDeleteExercise) {
+                        Image(systemName: "trash")
+                            .font(.body)
+                            .foregroundColor(Theme.Colors.error.opacity(0.7))
+                    }
                 }
             }
-            .buttonStyle(.plain)
 
             if isExpanded {
                 if let lastSets = workoutExercise.lastSets, !lastSets.isEmpty {
@@ -476,6 +500,7 @@ struct ExerciseCardView: View {
                 ForEach(workoutExercise.sets, id: \.id) { set in
                     SwipeableSetRow(
                         set: set,
+                        unit: workoutExercise.unit,
                         onToggleWarmUp: { onToggleWarmUp(set.id) },
                         onUpdate: { weight, reps in onUpdateSet(set.id, weight, reps) },
                         onDelete: { onDeleteSet(set.id) }
@@ -496,19 +521,18 @@ struct ExerciseCardView: View {
         .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
-                onRequestDeleteExercise()
-            } label: {
-                Label("删除", systemImage: "trash")
-            }
-        }
     }
 
     private func formatLastSets(_ sets: [ExerciseSetDisplay]) -> String {
         let validSets = sets.prefix(3)
         let parts = validSets.map { set in
-            String(format: "%.1f×%d", set.weight, set.reps)
+            if set.weight > 0 && set.reps > 0 {
+                return String(format: "%.1f×%d", set.weight, set.reps)
+            } else if set.weight > 0 {
+                return String(format: "%.1f", set.weight)
+            } else {
+                return "\(set.reps)次"
+            }
         }
         let result = parts.joined(separator: " ")
         if sets.count > 3 {
@@ -520,12 +544,29 @@ struct ExerciseCardView: View {
 
 struct SwipeableSetRow: View {
     let set: ExerciseSetDisplay
+    let unit: ExerciseUnit
     let onToggleWarmUp: () -> Void
     let onUpdate: (Double, Int) -> Void
     let onDelete: () -> Void
 
     @State private var weightText: String = ""
     @State private var repsText: String = ""
+
+    private var unitLabel: String {
+        switch unit {
+        case .weight: return "kg"
+        case .reps: return "次"
+        case .duration: return "分钟"
+        }
+    }
+
+    private var valuePlaceholder: String {
+        switch unit {
+        case .weight: return "0"
+        case .reps: return "0"
+        case .duration: return "0"
+        }
+    }
 
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
@@ -539,25 +580,53 @@ struct SwipeableSetRow: View {
                     .cornerRadius(6)
             }
 
-            TextField("0", text: $weightText)
-                .keyboardType(.decimalPad)
+            TextField(valuePlaceholder, text: $weightText)
+                .keyboardType(unit == .duration ? .numberPad : .decimalPad)
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 80)
-                .onAppear { weightText = set.weight > 0 ? String(format: "%.1f", set.weight) : "" }
+                .onAppear {
+                if set.weight > 0 {
+                    if unit == .duration {
+                        weightText = "\(Int(set.weight))"
+                    } else {
+                        weightText = String(format: "%.1f", set.weight)
+                    }
+                } else {
+                    weightText = ""
+                }
+            }
+                .onChange(of: weightText) { newValue in
+                    if unit == .duration {
+                        if let weight = Int(newValue), weight > 0 {
+                            onUpdate(Double(weight), repsText.isEmpty ? 0 : Int(repsText) ?? 0)
+                        }
+                    } else {
+                        if let weight = Double(newValue), weight > 0 {
+                            onUpdate(weight, repsText.isEmpty ? 0 : Int(repsText) ?? 0)
+                        }
+                    }
+                }
 
-            Text("kg")
+            Text(unitLabel)
                 .font(Theme.Fonts.body)
                 .foregroundColor(Color.white)
 
-            TextField("0", text: $repsText)
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: 60)
-                .onAppear { repsText = set.reps > 0 ? "\(set.reps)" : "" }
+            if unit != .duration {
+                TextField("0", text: $repsText)
+                    .keyboardType(.numberPad)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 60)
+                    .onAppear { repsText = set.reps > 0 ? "\(set.reps)" : "" }
+                    .onChange(of: repsText) { newValue in
+                        if let reps = Int(newValue), let weight = Double(weightText), weight > 0 {
+                            onUpdate(weight, reps)
+                        }
+                    }
 
-            Text("次")
-                .font(Theme.Fonts.body)
-                .foregroundColor(Color.white)
+                Text("次")
+                    .font(Theme.Fonts.body)
+                    .foregroundColor(Color.white)
+            }
 
             Spacer()
 
@@ -579,4 +648,144 @@ struct SwipeableSetRow: View {
 
 #Preview {
     RecordView()
+}
+
+// MARK: - BodyPartPickerView
+struct BodyPartPickerView: View {
+    let selectedBodyPart: BodyPart
+    let onSelect: (BodyPart) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(BodyPart.allCases, id: \.self) { bodyPart in
+                    Button(action: {
+                        onSelect(bodyPart)
+                    }) {
+                        HStack {
+                            Circle()
+                                .fill(bodyPart.themeColor)
+                                .frame(width: 12, height: 12)
+                            Text(bodyPart.displayName)
+                                .foregroundColor(Theme.Colors.textPrimary)
+                            Spacer()
+                            if bodyPart == selectedBodyPart {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(Theme.Colors.accent)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("选择部位")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("取消") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
+// MARK: - WorkoutRecoveryView
+struct WorkoutRecoveryView: View {
+    let workout: Workout
+    let onResume: () -> Void
+    let onDiscard: () -> Void
+
+    @State private var isAnimating = false
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.85)
+                .ignoresSafeArea()
+
+            VStack(spacing: Theme.Spacing.xl) {
+                Spacer()
+
+                // Animated icon
+                ZStack {
+                    Circle()
+                        .fill(Theme.Colors.accent.opacity(0.2))
+                        .frame(width: 140, height: 140)
+                        .scaleEffect(isAnimating ? 1.1 : 1.0)
+
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 70))
+                        .foregroundColor(Theme.Colors.accent)
+                        .rotationEffect(.degrees(isAnimating ? 5 : -5))
+                }
+                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)
+
+                VStack(spacing: Theme.Spacing.md) {
+                    Text("发现未完成的训练")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(Theme.Colors.textPrimary)
+
+                    Text("您有一项训练记录尚未完成")
+                        .font(Theme.Fonts.body)
+                        .foregroundColor(Theme.Colors.textSecondary)
+
+                    // Workout summary
+                    VStack(spacing: Theme.Spacing.sm) {
+                        Text("\(formatDate(workout.startTime))")
+                            .font(Theme.Fonts.headline)
+                            .foregroundColor(Theme.Colors.accent)
+
+                        Text("\(workout.exercises.count) 个动作 · \(formatDuration(Date().timeIntervalSince(workout.startTime)))")
+                            .font(Theme.Fonts.body)
+                            .foregroundColor(Theme.Colors.textMuted)
+                    }
+                    .padding()
+                    .background(Theme.Colors.surface)
+                    .cornerRadius(Theme.CornerRadius.medium)
+                }
+
+                Spacer()
+
+                VStack(spacing: Theme.Spacing.md) {
+                    Button(action: onResume) {
+                        HStack {
+                            Image(systemName: "play.circle.fill")
+                            Text("继续训练")
+                        }
+                        .font(Theme.Fonts.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Theme.Colors.accent)
+                        .cornerRadius(Theme.CornerRadius.medium)
+                    }
+
+                    Button(action: onDiscard) {
+                        Text("放弃此次训练")
+                            .font(Theme.Fonts.body)
+                            .foregroundColor(Theme.Colors.error)
+                    }
+                }
+                .padding(.horizontal, Theme.Spacing.xl)
+                .padding(.bottom, Theme.Spacing.xl)
+            }
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M月d日 HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func formatDuration(_ interval: TimeInterval) -> String {
+        let minutes = Int(interval) / 60
+        return "\(minutes) 分钟"
+    }
 }

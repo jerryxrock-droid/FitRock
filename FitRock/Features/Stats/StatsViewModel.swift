@@ -137,6 +137,17 @@ final class StatsViewModel: ObservableObject {
         personalRecords = []
         workouts = []
     }
+
+    func deleteWorkout(_ workoutId: String) {
+        do {
+            try db.connect()
+            try db.deleteWorkout(workoutId)
+            loadStats(for: .week)
+            Haptic.medium.trigger()
+        } catch {
+            print("Error deleting workout: \(error)")
+        }
+    }
 }
 
 struct BodyPartStat: Identifiable {
