@@ -34,4 +34,14 @@ struct WorkoutExerciseDisplay: Identifiable {
         self.sets = workoutExercise.sets.map { ExerciseSetDisplay(from: $0) }
         self.lastSets = lastSets
     }
+
+    init(id: String, exerciseId: String, exerciseName: String, bodyPart: BodyPart, unit: ExerciseUnit, sets: [ExerciseSetDisplay], lastSets: [ExerciseSetDisplay]?) {
+        self.id = id
+        self.exerciseId = exerciseId
+        self.exerciseName = exerciseName
+        self.bodyPart = bodyPart
+        self.unit = unit
+        self.sets = sets
+        self.lastSets = lastSets
+    }
 }

@@ -32,4 +32,12 @@ struct ExerciseSetDisplay: Identifiable {
         self.reps = set.reps
         self.setType = set.setType
     }
+
+    init(id: String, setNumber: Int, weight: Double, reps: Int, setType: ExerciseSetType) {
+        self.id = id
+        self.setNumber = setNumber
+        self.weight = weight
+        self.reps = reps
+        self.setType = setType
+    }
 }

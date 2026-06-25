@@ -4,7 +4,16 @@ struct WorkoutSummaryView: View {
     let workout: Workout?
     let exercises: [WorkoutExerciseDisplay]
     let duration: TimeInterval
+    let newPRs: [PersonalRecordEvent]
     let onComplete: () -> Void
+
+    init(workout: Workout?, exercises: [WorkoutExerciseDisplay], duration: TimeInterval, newPRs: [PersonalRecordEvent] = [], onComplete: @escaping () -> Void) {
+        self.workout = workout
+        self.exercises = exercises
+        self.duration = duration
+        self.newPRs = newPRs
+        self.onComplete = onComplete
+    }
 
     @Environment(\.dismiss) private var dismiss
 
@@ -35,6 +44,61 @@ struct WorkoutSummaryView: View {
                 ScrollView {
                     VStack(spacing: Theme.Spacing.lg) {
                         summaryHeader
+
+                        if !newPRs.isEmpty {
+                            VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                                HStack {
+                                    Image(systemName: "trophy.fill")
+                                        .foregroundColor(Theme.Colors.warning)
+                                    Text("新纪录")
+                                        .font(Theme.Fonts.headline)
+                                        .foregroundColor(Theme.Colors.textPrimary)
+                                }
+
+                                ForEach(newPRs) { event in
+                                    HStack(spacing: Theme.Spacing.sm) {
+                                        Image(systemName: event.prType.icon)
+                                            .font(.title2)
+                                            .foregroundColor(Theme.Colors.warning)
+                                            .frame(width: 28)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            HStack {
+                                                Text(event.exerciseName)
+                                                    .font(Theme.Fonts.body)
+                                                    .foregroundColor(Theme.Colors.textPrimary)
+                                                Spacer()
+                                                Text(event.formattedNewValue)
+                                                    .font(.system(size: 16, weight: .bold))
+                                                    .foregroundColor(Theme.Colors.accent)
+                                            }
+                                            HStack {
+                                                Text(event.prType.displayName)
+                                                    .font(Theme.Fonts.caption)
+                                                    .foregroundColor(Theme.Colors.textMuted)
+                                                Spacer()
+                                                if event.isNewRecord {
+                                                    Text("新纪录")
+                                                        .font(.system(size: 11, weight: .semibold))
+                                                        .foregroundColor(Theme.Colors.success)
+                                                } else if !event.formattedImprovement.isEmpty {
+                                                    Text(event.formattedImprovement)
+                                                        .font(.system(size: 11, weight: .semibold))
+                                                        .foregroundColor(Theme.Colors.success)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .padding(.vertical, Theme.Spacing.xs)
+                                    if event.id != newPRs.last?.id {
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .padding()
+                            .background(Theme.Colors.surface)
+                            .cornerRadius(Theme.CornerRadius.medium)
+                        }
 
                         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
                             Text("训练详情")

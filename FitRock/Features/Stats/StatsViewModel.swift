@@ -60,7 +60,7 @@ final class StatsViewModel: ObservableObject {
 
         calculateBodyPartStats(from: workouts)
         calculateExerciseRanking(from: workouts)
-        calculatePersonalRecords(from: allWorkouts)
+        loadPersonalRecords()
     }
 
     private func calculateBodyPartStats(from workouts: [Workout]) {
@@ -97,34 +97,18 @@ final class StatsViewModel: ObservableObject {
             .map { ExerciseRankItem(name: $0.name, volume: $0.volume) }
     }
 
-    private func calculatePersonalRecords(from workouts: [Workout]) {
-        var exerciseMaxWeight: [String: (weight: Double, date: Date, exerciseName: String)] = [:]
-
-        for workout in workouts {
-            for we in workout.exercises {
-                for set in we.sets {
-                    if set.setType == .normal && set.weight > 0 {
-                        let current = exerciseMaxWeight[we.exerciseName]
-                        if current == nil || set.weight > current!.weight {
-                            exerciseMaxWeight[we.exerciseName] = (weight: set.weight, date: workout.startTime, exerciseName: we.exerciseName)
-                        }
-                    }
-                }
+    private func loadPersonalRecords() {
+        do {
+            var records = try db.getPersonalRecords()
+            if records.isEmpty {
+                try PRService.shared.rebuildAllPersonalRecords()
+                records = try db.getPersonalRecords()
             }
+            personalRecords = records
+        } catch {
+            print("Error loading personal records: \(error)")
+            personalRecords = []
         }
-
-        personalRecords = exerciseMaxWeight.values
-            .sorted { $0.weight > $1.weight }
-            .prefix(5)
-            .map { pr in
-                let formatter = DateFormatter()
-                formatter.dateFormat = "M月d日"
-                return PersonalRecord(
-                    exerciseName: pr.exerciseName,
-                    maxWeight: pr.weight,
-                    date: formatter.string(from: pr.date)
-                )
-            }
     }
 
     private func resetStats() {
@@ -142,6 +126,7 @@ final class StatsViewModel: ObservableObject {
         do {
             try db.connect()
             try db.deleteWorkout(workoutId)
+            try PRService.shared.rebuildAllPersonalRecords()
             loadStats(for: .week)
             Haptic.medium.trigger()
         } catch {
@@ -161,13 +146,6 @@ struct ExerciseRankItem: Identifiable {
     let id = UUID()
     let name: String
     let volume: Double
-}
-
-struct PersonalRecord: Identifiable {
-    let id = UUID()
-    let exerciseName: String
-    let maxWeight: Double
-    let date: String
 }
 
 enum StatsPeriod: String, CaseIterable {

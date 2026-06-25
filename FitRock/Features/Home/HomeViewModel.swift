@@ -6,6 +6,7 @@ final class HomeViewModel: ObservableObject {
     @Published var monthVolume: Double = 0
     @Published var selectedDateWorkouts: [Workout] = []
     @Published var datesWithWorkouts: Set<Date> = []
+    @Published var dateBodyParts: [Date: [BodyPart]] = [:]
 
     private let db = DatabaseManager.shared
 
@@ -30,11 +31,8 @@ final class HomeViewModel: ObservableObject {
     }
 
     func workoutBodyParts(on date: Date) -> [BodyPart] {
-        guard let workout = selectedDateWorkouts.first(where: {
-            Calendar.current.isDate($0.startTime, inSameDayAs: date)
-        }) else { return [] }
-
-        return workout.exercises.map { $0.bodyPart }
+        let calendar = Calendar.current
+        return dateBodyParts.first(where: { calendar.isDate($0.key, inSameDayAs: date) })?.value ?? []
     }
 
     func workoutBodyPart(on date: Date) -> BodyPart? {
@@ -67,15 +65,20 @@ final class HomeViewModel: ObservableObject {
             let workouts = try db.getAllCompletedWorkouts()
 
             let calendar = Calendar.current
-            datesWithWorkouts = Set(workouts.compactMap { workout in
-                guard calendar.isDate(workout.startTime, equalTo: date, toGranularity: .month) else {
-                    return nil
-                }
-                return calendar.startOfDay(for: workout.startTime)
+            var bodyParts: [Date: [BodyPart]] = [:]
+            let monthWorkouts = workouts.filter { calendar.isDate($0.startTime, equalTo: date, toGranularity: .month) }
+
+            datesWithWorkouts = Set(monthWorkouts.compactMap { workout in
+                let day = calendar.startOfDay(for: workout.startTime)
+                bodyParts[day, default: []] += workout.exercises.map { $0.bodyPart }
+                return day
             })
+
+            dateBodyParts = bodyParts
         } catch {
             print("Error loading dates with workouts: \(error)")
             datesWithWorkouts = []
+            dateBodyParts = [:]
         }
     }
 

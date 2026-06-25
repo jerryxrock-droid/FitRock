@@ -82,23 +82,39 @@ struct StatsView: View {
                     .font(Theme.Fonts.body)
                     .foregroundColor(Theme.Colors.textMuted)
             } else {
-                ForEach(viewModel.personalRecords) { pr in
+                let grouped = Dictionary(grouping: viewModel.personalRecords) { $0.exerciseName }
+                let bestRecords: [PersonalRecord] = grouped.values.compactMap { records in
+                    // Priority: maxWeight > exerciseVolume > duration
+                    if let mw = records.first(where: { $0.prType == .maxWeight }) { return mw }
+                    if let vol = records.first(where: { $0.prType == .exerciseVolume }) { return vol }
+                    if let dur = records.first(where: { $0.prType == .duration }) { return dur }
+                    return nil
+                }.sorted { $0.prType.priority < $1.prType.priority }
+
+                ForEach(bestRecords) { pr in
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(pr.exerciseName)
-                                .font(Theme.Fonts.body)
-                                .foregroundColor(Theme.Colors.textPrimary)
-                            Text(pr.date)
-                                .font(Theme.Fonts.caption)
-                                .foregroundColor(Theme.Colors.textMuted)
+                            HStack(spacing: 6) {
+                                Image(systemName: pr.prType.icon)
+                                    .font(.caption)
+                                    .foregroundColor(Theme.Colors.warning)
+                                Text(pr.exerciseName)
+                                    .font(Theme.Fonts.body)
+                                    .foregroundColor(Theme.Colors.textPrimary)
+                            }
+                            if !pr.detailText.isEmpty {
+                                Text(pr.detailText)
+                                    .font(Theme.Fonts.caption)
+                                    .foregroundColor(Theme.Colors.textMuted)
+                            }
                         }
                         Spacer()
-                        Text("\(String(format: "%.1f", pr.maxWeight))kg")
-                            .font(.system(size: 18, weight: .bold))
+                        Text(pr.formattedValue)
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(Theme.Colors.accent)
                     }
                     .padding(.vertical, Theme.Spacing.xs)
-                    if pr.id != viewModel.personalRecords.last?.id {
+                    if pr.id != bestRecords.last?.id {
                         Divider()
                     }
                 }
@@ -266,7 +282,7 @@ struct PieChartView: View {
 
                 // Labels outside slices
                 ForEach(Array(sliceMidAngles.enumerated()), id: \.offset) { index, midAngle in
-                    let labelRadius = radius * 2.5
+                    let labelRadius = radius * 1.6
                     let x = center.x + labelRadius * cos(CGFloat(midAngle) * .pi / 180)
                     let y = center.y + labelRadius * sin(CGFloat(midAngle) * .pi / 180)
 

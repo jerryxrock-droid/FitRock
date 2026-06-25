@@ -13,6 +13,13 @@ struct RecordView: View {
     @State private var showCancelAlert = false
     @State private var showWorkoutRecovery = false
     @State private var prefillEnabled = true
+    @State private var showTemplateList = false
+    @State private var showTemplateCountdown = false
+    @State private var templateToStart: WorkoutTemplate?
+    @State private var quickTemplates: [WorkoutTemplate] = []
+    @State private var templateDetails: [String: (count: Int, names: [String])] = [:]
+    @State private var showTemplateConflictAlert = false
+    @State private var pendingTemplateChoice: WorkoutTemplate?
 
     var body: some View {
         NavigationStack {
@@ -33,10 +40,20 @@ struct RecordView: View {
                     })
                 }
 
+                // Template countdown overlay
+                if showTemplateCountdown, let template = templateToStart {
+                    CountdownView(onComplete: {
+                        showTemplateCountdown = false
+                        templateToStart = nil
+                        viewModel.startWorkoutFromTemplate(template.id)
+                    })
+                }
+
                 // Completion ring overlay
                 if showCompletionRing {
                     CompletionRingView(onComplete: {
                         showCompletionRing = false
+                        viewModel.finishWorkout()
                         showSummary = true
                     })
                 }
@@ -81,11 +98,15 @@ struct RecordView: View {
                     workout: viewModel.currentWorkout,
                     exercises: viewModel.workoutExercises,
                     duration: viewModel.elapsedTime,
+                    newPRs: viewModel.pendingNewPRs,
                     onComplete: {
-                        viewModel.finishWorkout()
+                        viewModel.dismissWorkoutSummary()
                         showSummary = false
                     }
                 )
+            }
+            .sheet(isPresented: $showTemplateList) {
+                TemplateListView()
             }
             .alert("无法结束训练", isPresented: $showEmptyAlert) {
                 Button("确定") { }
@@ -100,11 +121,27 @@ struct RecordView: View {
             } message: {
                 Text("确定要删除这个动作吗？")
             }
+            .alert("有未完成的训练", isPresented: $showTemplateConflictAlert) {
+                Button("放弃并从模板开始", role: .destructive) {
+                    if let template = pendingTemplateChoice {
+                        appState.discardUnfinishedWorkout()
+                        templateToStart = template
+                        pendingTemplateChoice = nil
+                        showTemplateCountdown = true
+                    }
+                }
+                Button("继续当前训练", role: .cancel) {
+                    pendingTemplateChoice = nil
+                }
+            } message: {
+                Text("您有未完成的训练，是否放弃并从模板开始？")
+            }
             .onAppear {
                 if appState.shouldResumeWorkout, appState.unfinishedWorkout != nil {
                     showWorkoutRecovery = true
                     appState.shouldResumeWorkout = false
                 }
+                loadQuickTemplates()
             }
             .overlay {
                 if showWorkoutRecovery, let workout = appState.unfinishedWorkout {
@@ -172,36 +209,90 @@ struct RecordView: View {
                 Spacer()
             }
         } else {
-            // No unfinished workout - show start new
-            VStack(spacing: Theme.Spacing.lg) {
-                Spacer()
+            // No unfinished workout - show start new + template quick-pick
+            ScrollView {
+                VStack(spacing: Theme.Spacing.lg) {
+                    Spacer().frame(height: 40)
 
-                Image(systemName: "figure.strengthtraining.traditional")
-                    .font(.system(size: 80))
-                    .foregroundColor(Theme.Colors.textMuted)
+                    Image(systemName: "figure.strengthtraining.traditional")
+                        .font(.system(size: 72))
+                        .foregroundColor(Theme.Colors.textMuted)
 
-                Text("开始训练")
-                    .font(Theme.Fonts.title)
-                    .foregroundColor(Theme.Colors.textPrimary)
+                    VStack(spacing: Theme.Spacing.sm) {
+                        Text("开始训练")
+                            .font(Theme.Fonts.title)
+                            .foregroundColor(Theme.Colors.textPrimary)
 
-                Text("记录每一次进步")
-                    .font(Theme.Fonts.body)
-                    .foregroundColor(Theme.Colors.textMuted)
+                        Text("记录每一次进步")
+                            .font(Theme.Fonts.body)
+                            .foregroundColor(Theme.Colors.textMuted)
+                    }
 
-                Button {
-                    showCountdown = true
-                } label: {
-                    Text("开始训练")
-                        .font(Theme.Fonts.headline)
-                        .foregroundColor(.white)
+                    Button {
+                        showCountdown = true
+                    } label: {
+                        Text("开始训练")
+                            .font(Theme.Fonts.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Theme.Colors.accent)
+                            .cornerRadius(Theme.CornerRadius.medium)
+                    }
+                    .padding(.horizontal, Theme.Spacing.xl)
+
+                    // Template quick-start section
+                    if !quickTemplates.isEmpty {
+                        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                            Text("从模板开始")
+                                .font(Theme.Fonts.headline)
+                                .foregroundColor(Theme.Colors.textPrimary)
+                                .padding(.horizontal, Theme.Spacing.xl)
+
+                            ForEach(Array(quickTemplates.prefix(3).enumerated()), id: \.element.id) { _, template in
+                                let detail = templateDetails[template.id]
+                                TemplateQuickStartCard(
+                                    templateName: template.name,
+                                    exerciseCount: detail?.count ?? 0,
+                                    exercisePreview: detail?.names ?? [],
+                                    onTap: { startFromTemplate(template) }
+                                )
+                                .padding(.horizontal, Theme.Spacing.xl)
+                            }
+
+                            if quickTemplates.count > 3 {
+                                Button {
+                                    showTemplateList = true
+                                } label: {
+                                    Text("更多模板 (\(quickTemplates.count) 个)")
+                                        .font(Theme.Fonts.body)
+                                        .foregroundColor(Theme.Colors.accent)
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                }
+                                .padding(.horizontal, Theme.Spacing.xl)
+                            }
+                        }
+                    }
+
+                    Button {
+                        showTemplateList = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "slider.horizontal.3")
+                            Text("管理模板")
+                        }
+                        .font(Theme.Fonts.body)
+                        .foregroundColor(Theme.Colors.textSecondary)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Theme.Colors.accent)
+                        .background(Theme.Colors.surface)
                         .cornerRadius(Theme.CornerRadius.medium)
-                }
-                .padding(.horizontal, Theme.Spacing.xl)
+                    }
+                    .padding(.horizontal, Theme.Spacing.xl)
 
-                Spacer()
+                    Spacer().frame(height: 40)
+                }
             }
         }
     }
@@ -215,6 +306,36 @@ struct RecordView: View {
     private func formatDuration(_ interval: TimeInterval) -> String {
         let minutes = Int(interval) / 60
         return "\(minutes) 分钟"
+    }
+
+    private func startFromTemplate(_ template: WorkoutTemplate) {
+        if appState.unfinishedWorkout != nil {
+            pendingTemplateChoice = template
+            showTemplateConflictAlert = true
+        } else {
+            templateToStart = template
+            showTemplateCountdown = true
+        }
+    }
+
+    private func loadQuickTemplates() {
+        do {
+            let db = DatabaseManager.shared
+            try db.connect()
+            let templates = try db.getWorkoutTemplates()
+            quickTemplates = templates
+
+            var details: [String: (count: Int, names: [String])] = [:]
+            for t in templates {
+                if let detail = try db.getWorkoutTemplateDetail(templateId: t.id) {
+                    let (_, exercises, _) = detail
+                    details[t.id] = (count: exercises.count, names: exercises.map { $0.exerciseName })
+                }
+            }
+            templateDetails = details
+        } catch {
+            print("Error loading quick templates: \(error)")
+        }
     }
 
     private var activeWorkoutView: some View {
@@ -306,6 +427,7 @@ struct CountdownView: View {
 
     @State private var countdownNumber = 3
     @State private var isActive = false
+    @State private var task: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -329,33 +451,29 @@ struct CountdownView: View {
             }
         }
         .onAppear {
-            startCountdown()
-        }
-    }
-
-    private func startCountdown() {
-        isActive = true
-
-        // 3 -> 2 -> 1 -> 0 (GO)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            countdownNumber = 2
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-            countdownNumber = 1
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) {
-            countdownNumber = 0
-        }
-
-        // Fade out and complete
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
-            withAnimation(.easeOut(duration: 0.25)) {
-                isActive = false
+            task = Task {
+                isActive = true
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                if Task.isCancelled { return }
+                countdownNumber = 2
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                if Task.isCancelled { return }
+                countdownNumber = 1
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                if Task.isCancelled { return }
+                countdownNumber = 0
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                if Task.isCancelled { return }
+                withAnimation(.easeOut(duration: 0.25)) {
+                    isActive = false
+                }
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                if Task.isCancelled { return }
+                onComplete()
             }
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
-            onComplete()
+        .onDisappear {
+            task?.cancel()
         }
     }
 }
@@ -541,9 +659,9 @@ struct ExerciseCardView: View {
         }
         let result = parts.joined(separator: " ")
         if sets.count > 3 {
-            return result + "...)"
+            return result + "..."
         }
-        return result + ")"
+        return result
     }
 }
 
@@ -789,5 +907,46 @@ struct WorkoutRecoveryView: View {
     private func formatDuration(_ interval: TimeInterval) -> String {
         let minutes = Int(interval) / 60
         return "\(minutes) 分钟"
+    }
+}
+
+// MARK: - TemplateQuickStartCard
+struct TemplateQuickStartCard: View {
+    let templateName: String
+    let exerciseCount: Int
+    let exercisePreview: [String]
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                    HStack {
+                        Text(templateName)
+                            .font(Theme.Fonts.headline)
+                            .foregroundColor(Theme.Colors.textPrimary)
+                        Spacer()
+                        Text("\(exerciseCount) 个动作")
+                            .font(Theme.Fonts.caption)
+                            .foregroundColor(Theme.Colors.textMuted)
+                    }
+
+                    if !exercisePreview.isEmpty {
+                        Text(exercisePreview.prefix(4).joined(separator: " · "))
+                            .font(Theme.Fonts.caption)
+                            .foregroundColor(Theme.Colors.textMuted)
+                            .lineLimit(1)
+                    }
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(Theme.Colors.textMuted)
+            }
+            .padding()
+            .background(Theme.Colors.surface)
+            .cornerRadius(Theme.CornerRadius.medium)
+        }
+        .buttonStyle(.plain)
     }
 }

@@ -6,6 +6,7 @@ final class RecordViewModel: ObservableObject {
     @Published var currentWorkout: Workout?
     @Published var workoutExercises: [WorkoutExerciseDisplay] = []
     @Published var elapsedTime: TimeInterval = 0
+    @Published var pendingNewPRs: [PersonalRecordEvent] = []
 
     private let db = DatabaseManager.shared
     private var timer: Timer?
@@ -80,21 +81,27 @@ final class RecordViewModel: ObservableObject {
 
         workout.endTime = Date()
         workout.isCompleted = true
+        currentWorkout = workout
 
         do {
             try db.connect()
             try db.saveWorkout(workout)
+            pendingNewPRs = try PRService.shared.evaluateAndSave(workout: workout)
         } catch {
             print("Error finishing workout: \(error)")
+            pendingNewPRs = []
         }
 
+        Haptic.success.trigger()
+    }
+
+    func dismissWorkoutSummary() {
+        pendingNewPRs = []
         currentWorkout = nil
         isWorkoutActive = false
         workoutExercises = []
         expandedIds = []
         workoutStartTime = nil
-
-        Haptic.success.trigger()
     }
 
     func cancelWorkout() {
@@ -282,6 +289,27 @@ final class RecordViewModel: ObservableObject {
         expandedIds.contains(id)
     }
 
+    func startWorkoutFromTemplate(_ templateId: String) {
+        do {
+            try db.connect()
+            guard let result = try db.createWorkoutFromTemplate(templateId) else { return }
+            let (workout, exercisesDisplay) = result
+
+            workoutStartTime = workout.startTime
+            currentWorkout = workout
+            isWorkoutActive = true
+            workoutExercises = exercisesDisplay
+            elapsedTime = 0
+            expandedIds = Set(exercisesDisplay.map { $0.id })
+
+            try db.saveWorkout(workout)
+            startTimer()
+            Haptic.success.trigger()
+        } catch {
+            print("Error starting workout from template: \(error)")
+        }
+    }
+
     private func loadWorkoutExercises() {
         guard let workout = currentWorkout else {
             workoutExercises = []
@@ -306,6 +334,7 @@ final class RecordViewModel: ObservableObject {
     }
 
     private func startTimer() {
+        stopTimer()
         // Use Date-based timing for accuracy even when app is backgrounded
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self, let startTime = self.workoutStartTime else { return }
