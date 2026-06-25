@@ -64,6 +64,8 @@ final class AppState: ObservableObject {
     @Published var unfinishedWorkout: Workout?
     @Published var showRecoveryAlert = false
     @Published var shouldResumeWorkout = false
+    @Published var selectedTab = 0
+    @Published var workoutStartedExternally = false
 
     private let db = DatabaseManager.shared
 

@@ -141,6 +141,17 @@ struct RecordView: View {
                     showWorkoutRecovery = true
                     appState.shouldResumeWorkout = false
                 }
+                if appState.workoutStartedExternally, !viewModel.isWorkoutActive {
+                    appState.workoutStartedExternally = false
+                    do {
+                        try DatabaseManager.shared.connect()
+                        if let workout = try DatabaseManager.shared.getUnfinishedWorkout() {
+                            viewModel.resumeWorkout(from: workout)
+                        }
+                    } catch {
+                        print("Error resuming externally started workout: \(error)")
+                    }
+                }
                 loadQuickTemplates()
             }
             .overlay {
