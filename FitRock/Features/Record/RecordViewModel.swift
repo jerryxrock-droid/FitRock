@@ -179,16 +179,16 @@ final class RecordViewModel: ObservableObject {
         }
     }
 
-    func addSet(to workoutExercise: WorkoutExerciseDisplay) {
+    func addSet(to workoutExercise: WorkoutExerciseDisplay, prefill: Bool) {
         guard var workout = currentWorkout,
               let index = workout.exercises.firstIndex(where: { $0.id == workoutExercise.id }) else { return }
 
         let lastSetNumber = workout.exercises[index].sets.count + 1
 
-        // Pre-fill with last workout's values if available
+        // Pre-fill with last workout's values if enabled
         var defaultWeight: Double = 0
         var defaultReps: Int = 0
-        if let lastSet = workoutExercise.lastSets?.last {
+        if prefill, let lastSet = workoutExercise.lastSets?.last {
             defaultWeight = lastSet.weight
             defaultReps = lastSet.reps
         }

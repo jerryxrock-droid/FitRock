@@ -12,6 +12,7 @@ struct RecordView: View {
     @State private var showCompletionRing = false
     @State private var showCancelAlert = false
     @State private var showWorkoutRecovery = false
+    @State private var prefillEnabled = true
 
     var body: some View {
         NavigationStack {
@@ -227,13 +228,10 @@ struct RecordView: View {
                             workoutExercise: we,
                             onToggleExpand: { viewModel.toggleExpand(for: we.id) },
                             isExpanded: viewModel.isExpanded(we.id),
-                            onAddSet: { viewModel.addSet(to: we) },
+                            onAddSet: { viewModel.addSet(to: we, prefill: prefillEnabled) },
                             onDeleteSet: { setId in viewModel.deleteSet(setId, from: we) },
                             onUpdateSet: { setId, weight, reps in
                                 viewModel.updateSet(setId, weight: weight, reps: reps, in: we)
-                            },
-                            onToggleWarmUp: { setId in
-                                viewModel.toggleWarmUp(setId, in: we)
                             },
                             onRequestDeleteExercise: {
                                 pendingDiscardAction = { viewModel.deleteExercise(we) }
@@ -260,12 +258,21 @@ struct RecordView: View {
                     .foregroundColor(Theme.Colors.accent)
             }
             Spacer()
-            VStack(alignment: .trailing) {
-                Text("\(viewModel.workoutExercises.count) 个动作")
-                    .font(Theme.Fonts.body)
-                Text("\(viewModel.totalSets) 组")
-                    .font(Theme.Fonts.caption)
-                    .foregroundColor(Theme.Colors.textMuted)
+            HStack(spacing: Theme.Spacing.md) {
+                VStack(alignment: .trailing) {
+                    Text("\(viewModel.workoutExercises.count) 个动作")
+                        .font(Theme.Fonts.body)
+                    Text("\(viewModel.totalSets) 组")
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textMuted)
+                }
+                Button {
+                    prefillEnabled.toggle()
+                } label: {
+                    Image(systemName: prefillEnabled ? "doc.on.clipboard.fill" : "doc.on.clipboard")
+                        .font(.title2)
+                        .foregroundColor(prefillEnabled ? Theme.Colors.accent : Theme.Colors.textMuted)
+                }
             }
         }
         .padding()
@@ -435,7 +442,6 @@ struct ExerciseCardView: View {
     let onAddSet: () -> Void
     let onDeleteSet: (String) -> Void
     let onUpdateSet: (String, Double, Int) -> Void
-    let onToggleWarmUp: (String) -> Void
     let onRequestDeleteExercise: () -> Void
 
     var body: some View {
@@ -501,7 +507,6 @@ struct ExerciseCardView: View {
                     SwipeableSetRow(
                         set: set,
                         unit: workoutExercise.unit,
-                        onToggleWarmUp: { onToggleWarmUp(set.id) },
                         onUpdate: { weight, reps in onUpdateSet(set.id, weight, reps) },
                         onDelete: { onDeleteSet(set.id) }
                     )
@@ -545,7 +550,6 @@ struct ExerciseCardView: View {
 struct SwipeableSetRow: View {
     let set: ExerciseSetDisplay
     let unit: ExerciseUnit
-    let onToggleWarmUp: () -> Void
     let onUpdate: (Double, Int) -> Void
     let onDelete: () -> Void
 
@@ -570,15 +574,13 @@ struct SwipeableSetRow: View {
 
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
-            Button(action: onToggleWarmUp) {
-                Text(set.setType == .warmup ? "W" : "\(set.setNumber)")
-                    .font(Theme.Fonts.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(set.setType == .warmup ? .white : Theme.Colors.textSecondary)
-                    .frame(width: 30, height: 30)
-                    .background(set.setType == .warmup ? Theme.Colors.warning : Theme.Colors.surface2)
-                    .cornerRadius(6)
-            }
+            Text("\(set.setNumber)")
+                .font(Theme.Fonts.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(Theme.Colors.textSecondary)
+                .frame(width: 30, height: 30)
+                .background(Theme.Colors.surface2)
+                .cornerRadius(6)
 
             TextField(valuePlaceholder, text: $weightText)
                 .keyboardType(unit == .duration ? .numberPad : .decimalPad)
