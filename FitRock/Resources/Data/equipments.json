@@ -1,0 +1,594 @@
+[
+  {
+    "id": "lat_pulldown",
+    "nameZh": "高位下拉机",
+    "nameEn": "Lat Pulldown Machine",
+    "category": "cable",
+    "targetMusclesZh": [
+      "背阔肌"
+    ],
+    "secondaryMusclesZh": [
+      "肱二头肌",
+      "中背部",
+      "斜方肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "高位下拉机是训练背阔肌的经典固定器械，通过调整握法和身体角度可以刺激背部不同区域。适合从初学者到高级训练者，是打造V形背部的核心动作。",
+    "adjustmentsZh": [
+      "调整座椅高度，使大腿固定垫刚好压住大腿上方。",
+      "调整大腿固定垫位置，确保身体在拉动时不会向上移动。",
+      "根据动作选择合适把手：宽握把手练背阔肌宽度，窄握把手练背阔肌下沿。",
+      "选择合适重量，从轻重量开始热身。"
+    ],
+    "safetyTipsZh": [
+      "不要将横杆拉到颈后，容易造成颈椎损伤。",
+      "不要身体大幅后仰借力，减少下背部压力。",
+      "不要猛拉猛放，保持动作控制。",
+      "肩膀保持下沉，不要耸肩代偿。"
+    ],
+    "exerciseIds": [
+      "wide_grip_lat_pulldown",
+      "close_grip_lat_pulldown"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "seated_row",
+    "nameZh": "坐姿划船机",
+    "nameEn": "Seated Cable Row Machine",
+    "category": "cable",
+    "targetMusclesZh": [
+      "中背部",
+      "背阔肌"
+    ],
+    "secondaryMusclesZh": [
+      "肱二头肌",
+      "菱形肌",
+      "斜方肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "坐姿划船机主要锻炼背部厚度，针对中背部和菱形肌。通过更换不同的握把可以改变训练角度，刺激背部不同区域。",
+    "adjustmentsZh": [
+      "调整座椅高度，使胸部对准握把位置。",
+      "调整脚踏板位置，确保膝盖微弯、腿部有适当支撑。",
+      "选择合适的握把：V形手柄窄握、直杆宽握、绳索灵活角度。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "背部保持挺直，不要含胸或过度挺腰。",
+      "利用手臂拉动，不要靠身体后仰借力。",
+      "回放时控制速度，不要突然松开。",
+      "肩胛骨在顶点做顶峰收缩后再回放。"
+    ],
+    "exerciseIds": [
+      "seated_cable_row",
+      "close_grip_seated_row"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "leg_press",
+    "nameZh": "腿举机",
+    "nameEn": "Leg Press Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "股四头肌",
+      "臀大肌"
+    ],
+    "secondaryMusclesZh": [
+      "腘绳肌",
+      "小腿"
+    ],
+    "imageName": null,
+    "descriptionZh": "腿举机可以安全地加载较大重量，集中锻炼股四头肌和臀肌。相比深蹲，腿举对下背部的压力更小，适合作为腿部训练的主要或辅助动作。",
+    "adjustmentsZh": [
+      "调整座椅靠背角度，找到舒适的位置。",
+      "调整安全限位杆，确保在力竭时能安全停住。",
+      "双脚与肩同宽踩在踏板中央。",
+      "选择合适重量，从轻到重递增。"
+    ],
+    "safetyTipsZh": [
+      "下放过深导致臀部离开坐垫时停止。",
+      "推起时膝盖不要完全锁死。",
+      "始终保持背部贴紧靠垫。",
+      "不要超负荷，控制动作速度。",
+      "膝盖有伤时避免动作到底。"
+    ],
+    "exerciseIds": [
+      "leg_press",
+      "single_leg_leg_press"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "cable_crossover",
+    "nameZh": "绳索训练器",
+    "nameEn": "Cable Crossover Machine",
+    "category": "cable",
+    "targetMusclesZh": [
+      "胸部",
+      "肩部",
+      "肱三头肌"
+    ],
+    "secondaryMusclesZh": [
+      "核心"
+    ],
+    "imageName": null,
+    "descriptionZh": "绳索训练器是健身房最灵活的器械之一，通过调节滑轮高度和更换不同附件，可以训练全身几乎所有肌肉群。",
+    "adjustmentsZh": [
+      "根据需要调节左右滑轮高度。",
+      "选择合适的附件（绳索、直杆、V形手柄等）。",
+      "调整重量插销到合适负重。",
+      "调整身体站位，确保动作全程绳索有张力。"
+    ],
+    "safetyTipsZh": [
+      "使用前检查钢缆和接头是否完好。",
+      "不要突然释放把手。",
+      "重量选择以能控制全程为准。",
+      "保持核心收紧，避免身体晃动。"
+    ],
+    "exerciseIds": [
+      "cable_crossover_fly",
+      "cable_face_pull"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "smith_machine",
+    "nameZh": "史密斯机",
+    "nameEn": "Smith Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "股四头肌",
+      "胸部",
+      "肩部"
+    ],
+    "secondaryMusclesZh": [
+      "臀部",
+      "肱三头肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "史密斯机将杠铃固定在垂直轨道上，提供稳定的运动轨迹，适合初学者学习动作模式，也适合高级训练者做高强度训练时保证安全。",
+    "adjustmentsZh": [
+      "调节杠铃高度至合适的起始位置。",
+      "旋转杠铃解锁后开始动作。",
+      "调整安全挂钩高度。",
+      "装上合适重量的铃片。"
+    ],
+    "safetyTipsZh": [
+      "动作结束前确保杠铃完全锁定在挂钩上。",
+      "不要依赖轨道完全代偿平衡。",
+      "注意杠铃锁定和解锁的方向。",
+      "保持自然动作轨迹，不要强扭身体适应轨道。"
+    ],
+    "exerciseIds": [
+      "smith_squat",
+      "smith_bench_press"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "leg_extension",
+    "nameZh": "腿屈伸机",
+    "nameEn": "Leg Extension Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMusclesZh": [],
+    "imageName": null,
+    "descriptionZh": "腿屈伸机是训练股四头肌的孤立器械，通过坐姿伸膝动作集中刺激大腿前侧肌肉。",
+    "adjustmentsZh": [
+      "调整座椅靠背位置。",
+      "调整腿部挡板使其位于脚踝上方。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作速度不要过快。",
+      "顶点不要锁死膝盖。",
+      "下放时不要放松让重量自由下落。",
+      "膝盖有伤时避免使用过大重量。"
+    ],
+    "exerciseIds": [
+      "leg_extension_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "leg_curl",
+    "nameZh": "腿弯举机",
+    "nameEn": "Leg Curl Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "腘绳肌"
+    ],
+    "secondaryMusclesZh": [
+      "小腿"
+    ],
+    "imageName": null,
+    "descriptionZh": "腿弯举机是训练大腿后侧腘绳肌的孤立器械，分坐姿和俯卧两种款式。",
+    "adjustmentsZh": [
+      "调整挡板位置使其位于脚踝后方。",
+      "调整腿部固定垫。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作过程保持髋部贴紧坐垫。",
+      "不要使用惯性甩动重量。",
+      "顶峰稍作停留再缓慢下放。"
+    ],
+    "exerciseIds": [
+      "leg_curl_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "chest_press_machine",
+    "nameZh": "坐姿推胸机",
+    "nameEn": "Chest Press Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMusclesZh": [
+      "肱三头肌",
+      "肩部前束"
+    ],
+    "imageName": null,
+    "descriptionZh": "坐姿推胸机提供固定的推举轨迹，安全有效训练胸大肌，是卧推的良好替代或辅助器械。",
+    "adjustmentsZh": [
+      "调整座椅高度，使手柄对准胸部中间位置。",
+      "调整背垫位置。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "推举时肩胛骨收紧后缩。",
+      "不要完全伸直手臂锁死肘关节。",
+      "回放时控制速度。"
+    ],
+    "exerciseIds": [
+      "machine_chest_press"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "pec_deck",
+    "nameZh": "蝴蝶机 / 夹胸机",
+    "nameEn": "Pec Deck Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMusclesZh": [
+      "肩部前束"
+    ],
+    "imageName": null,
+    "descriptionZh": "蝴蝶机是训练胸肌中缝和胸肌轮廓的孤立器械，通过夹胸动作集中刺激胸大肌。",
+    "adjustmentsZh": [
+      "调整座椅高度，使手柄对准胸部高度。",
+      "调整手臂位置至舒适的起始角度。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作过程中保持背部贴紧靠垫。",
+      "不要借助身体晃动发力。",
+      "顶峰收缩1-2秒再缓慢回放。"
+    ],
+    "exerciseIds": [
+      "pec_deck_fly"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "shoulder_press_machine",
+    "nameZh": "肩推机",
+    "nameEn": "Shoulder Press Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "肩部"
+    ],
+    "secondaryMusclesZh": [
+      "肱三头肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "肩推机提供固定的上推动作轨迹，安全有效地训练肩部三角肌。",
+    "adjustmentsZh": [
+      "调整座椅高度，使手柄对准肩部高度。",
+      "调整背垫。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "上推时不要完全锁死手肘。",
+      "下放时控制速度。",
+      "肩部有伤时使用轻重量或避免使用。"
+    ],
+    "exerciseIds": [
+      "machine_shoulder_press"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "assisted_pull_up",
+    "nameZh": "辅助引体向上机",
+    "nameEn": "Assisted Pull-Up Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "背阔肌",
+      "肱二头肌"
+    ],
+    "secondaryMusclesZh": [
+      "中背部",
+      "肩部"
+    ],
+    "imageName": null,
+    "descriptionZh": "辅助引体向上机通过配重片提供向上的辅助力，帮助训练者逐步建立引体向上力量。",
+    "adjustmentsZh": [
+      "跪在或站在辅助垫上。",
+      "调整辅助重量（越重越省力）。",
+      "双手正握横杆，握距宽于肩。"
+    ],
+    "safetyTipsZh": [
+      "下降时控制速度，不要突然下落。",
+      "随着力量增长逐渐减少辅助重量。",
+      "保持核心收紧，避免身体晃动。"
+    ],
+    "exerciseIds": [
+      "assisted_pull_up_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hack_squat",
+    "nameZh": "哈克深蹲机",
+    "nameEn": "Hack Squat Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "股四头肌",
+      "臀大肌"
+    ],
+    "secondaryMusclesZh": [
+      "腘绳肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "哈克深蹲机以固定的斜向轨迹引导深蹲动作，集中训练股四头肌，同时对下背部更友好。",
+    "adjustmentsZh": [
+      "调整肩垫位置。",
+      "双脚与肩同宽踩在踏板上。",
+      "解锁安全手柄。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "下蹲时膝盖不要过度超过脚尖。",
+      "动作到底时臀部不要离开靠垫。",
+      "站起时膝盖不要锁死。",
+      "结束时确保安全手柄完全锁定。"
+    ],
+    "exerciseIds": [
+      "hack_squat_ex"
+    ],
+    "difficulty": "中级"
+  },
+  {
+    "id": "calf_raise",
+    "nameZh": "小腿训练机",
+    "nameEn": "Calf Raise Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "小腿"
+    ],
+    "secondaryMusclesZh": [],
+    "imageName": null,
+    "descriptionZh": "小腿训练机专门针对小腿肌肉，通过负重提踵动作刺激腓肠肌和比目鱼肌。",
+    "adjustmentsZh": [
+      "调整肩垫高度。",
+      "脚尖踩在踏板边缘。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作幅度要大，充分拉伸和收缩。",
+      "顶点停留1-2秒。",
+      "下放时缓慢控制。"
+    ],
+    "exerciseIds": [
+      "seated_calf_raise"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hip_abduction",
+    "nameZh": "髋外展机",
+    "nameEn": "Hip Abduction Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "臀中肌",
+      "臀小肌"
+    ],
+    "secondaryMusclesZh": [
+      "阔筋膜张肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "髋外展机训练臀部外侧肌群，有助于改善臀型、增强髋关节稳定性。",
+    "adjustmentsZh": [
+      "调整腿部挡板至舒适位置。",
+      "背部贴紧靠垫。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作速度不要过快。",
+      "使用能控制全程的重量。",
+      "不要借助身体倾斜借力。"
+    ],
+    "exerciseIds": [
+      "hip_abduction_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hip_adduction",
+    "nameZh": "髋内收机",
+    "nameEn": "Hip Adduction Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "大腿内收肌群"
+    ],
+    "secondaryMusclesZh": [],
+    "imageName": null,
+    "descriptionZh": "髋内收机训练大腿内侧肌群，有助于改善腿型和髋关节灵活性。",
+    "adjustmentsZh": [
+      "调整腿部挡板至舒适位置。",
+      "背部贴紧靠垫。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "动作速度不要过快。",
+      "使用能控制全程的重量。",
+      "不要借助身体晃动借力。"
+    ],
+    "exerciseIds": [
+      "hip_adduction_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "bicep_curl_machine",
+    "nameZh": "二头弯举机",
+    "nameEn": "Bicep Curl Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "肱二头肌"
+    ],
+    "secondaryMusclesZh": [
+      "肱肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "二头弯举机提供固定的弯举轨迹，孤立训练肱二头肌，比自由重量弯举更稳定安全。",
+    "adjustmentsZh": [
+      "调整座椅高度，使上臂平放在垫板上。",
+      "调整把手位置。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "上臂始终贴紧垫板。",
+      "下放时不要完全放松手臂。",
+      "使用能控制全程的重量。"
+    ],
+    "exerciseIds": [
+      "machine_bicep_curl"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "tricep_pushdown",
+    "nameZh": "三头下压绳索",
+    "nameEn": "Tricep Pushdown Cable",
+    "category": "cable",
+    "targetMusclesZh": [
+      "肱三头肌"
+    ],
+    "secondaryMusclesZh": [],
+    "imageName": null,
+    "descriptionZh": "三头下压是使用龙门架绳索训练肱三头肌的经典动作，绳索提供持续张力。",
+    "adjustmentsZh": [
+      "将滑轮调至最高位置。",
+      "选择合适的附件（绳索、直杆、V形手柄）。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "手肘紧贴身体两侧保持固定。",
+      "不要借助身体前倾下压。",
+      "下压到底时稍作停留。"
+    ],
+    "exerciseIds": [
+      "tricep_pushdown_ex"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "ab_crunch_machine",
+    "nameZh": "腹肌卷腹机",
+    "nameEn": "Ab Crunch Machine",
+    "category": "plate_loaded",
+    "targetMusclesZh": [
+      "腹直肌"
+    ],
+    "secondaryMusclesZh": [],
+    "imageName": null,
+    "descriptionZh": "腹肌卷腹机提供固定的卷腹轨迹，给腹部训练增加负重阻力。",
+    "adjustmentsZh": [
+      "调整座椅高度。",
+      "双手握住上方把手。",
+      "选择合适重量。"
+    ],
+    "safetyTipsZh": [
+      "卷腹时用腹部发力，不要用手臂拉动。",
+      "回放时控制速度，腹部保持张力。",
+      "颈椎有伤的人谨慎使用。"
+    ],
+    "exerciseIds": [
+      "machine_crunch"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "treadmill",
+    "nameZh": "跑步机",
+    "nameEn": "Treadmill",
+    "category": "cardio",
+    "targetMusclesZh": [
+      "有氧"
+    ],
+    "secondaryMusclesZh": [
+      "小腿",
+      "股四头肌"
+    ],
+    "imageName": null,
+    "descriptionZh": "跑步机是最常见的有氧器械，通过调节速度和坡度可进行多种强度的心肺训练。",
+    "adjustmentsZh": [
+      "按下启动按钮。",
+      "调节速度到合适的跑步或步行配速。",
+      "调节坡度增加训练强度。",
+      "使用紧急停止夹确保安全。"
+    ],
+    "safetyTipsZh": [
+      "启动前双脚踩在两侧踏板。",
+      "先低速熟悉再逐步加快。",
+      "紧急停止夹夹在衣物上。",
+      "感到不适时降低速度或停止。"
+    ],
+    "exerciseIds": [
+      "treadmill_run",
+      "treadmill_walk"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "elliptical",
+    "nameZh": "椭圆机",
+    "nameEn": "Elliptical Machine",
+    "category": "cardio",
+    "targetMusclesZh": [
+      "有氧"
+    ],
+    "secondaryMusclesZh": [
+      "股四头肌",
+      "腘绳肌",
+      "臀部"
+    ],
+    "imageName": null,
+    "descriptionZh": "椭圆机是低冲击有氧器械，模拟步行/爬楼动作，对关节友好。",
+    "adjustmentsZh": [
+      "站上踏板，握住活动扶手。",
+      "调节阻力级别。",
+      "部分型号可调节坡度。"
+    ],
+    "safetyTipsZh": [
+      "保持身体直立，不要倚靠扶手。",
+      "脚掌踩实踏板。",
+      "从低阻力开始热身。"
+    ],
+    "exerciseIds": [
+      "elliptical_ex"
+    ],
+    "difficulty": "新手友好"
+  }
+]

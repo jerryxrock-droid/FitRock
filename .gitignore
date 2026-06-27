@@ -5,3 +5,7 @@ DerivedData/
 .swiftpm/
 build/
 .DS_Store
+
+# free-exercise-db (raw data, images are copied to Resources/ExerciseImages/)
+free-exercise-db-main/
+free-exercise-db-tmp/

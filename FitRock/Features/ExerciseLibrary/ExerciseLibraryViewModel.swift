@@ -29,6 +29,19 @@ final class ExerciseLibraryViewModel: ObservableObject {
         return result
     }
 
+    // MARK: - Equipment Mode
+
+    var filteredEquipments: [Equipment] {
+        let dataService = LocalExerciseDataService.shared
+        if searchText.isEmpty {
+            return dataService.equipments
+        }
+        return dataService.equipments.filter {
+            $0.nameZh.localizedCaseInsensitiveContains(searchText) ||
+            $0.nameEn.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
     func loadExercises() {
         isLoading = true
         errorMessage = nil

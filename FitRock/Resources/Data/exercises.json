@@ -1,0 +1,987 @@
+[
+  {
+    "id": "wide_grip_lat_pulldown",
+    "nameEn": "Wide-Grip Lat Pulldown",
+    "nameZh": "宽握高位下拉",
+    "equipmentId": "lat_pulldown",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "lats"
+    ],
+    "primaryMusclesZh": [
+      "背阔肌"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "middle back"
+    ],
+    "secondaryMusclesZh": [
+      "肱二头肌",
+      "中背部"
+    ],
+    "images": [
+      "Wide-Grip_Lat_Pulldown/0.jpg",
+      "Wide-Grip_Lat_Pulldown/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在高位下拉机前，调整大腿固定垫压住大腿。",
+      "双手正握横杆，握距宽于肩，手臂完全伸直。",
+      "身体略微后倾约15度，肩胛骨下沉后收。",
+      "呼气，用背部发力将横杆拉至上胸部位置，手肘朝下向后。",
+      "在顶点挤压背阔肌1秒。",
+      "吸气，缓慢控制横杆回到起始位置，感受背阔肌拉伸。"
+    ],
+    "commonMistakesZh": [
+      "身体过度后仰借力，变成类似划船的动作。",
+      "下拉时将横杆拉到颈后，增加颈椎压力。",
+      "手臂过度参与，背部发力感不足。",
+      "下放速度过快，丢失背部张力。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "close_grip_lat_pulldown",
+    "nameEn": "Close-Grip Lat Pulldown",
+    "nameZh": "窄握高位下拉",
+    "equipmentId": "lat_pulldown",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "lats"
+    ],
+    "primaryMusclesZh": [
+      "背阔肌"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "secondaryMusclesZh": [
+      "肱二头肌",
+      "前臂"
+    ],
+    "images": [
+      "Full_Range-Of-Motion_Lat_Pulldown/0.jpg",
+      "Full_Range-Of-Motion_Lat_Pulldown/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在高位下拉机前，调整大腿固定垫压住大腿。",
+      "双手正握V形手柄或对握窄握把手，握距与肩同宽或更窄。",
+      "身体略微后倾，肩胛骨下沉。",
+      "呼气，将把手拉至上胸部位置，手肘紧贴身体两侧向后。",
+      "在顶点挤压背阔肌下沿1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "手肘过度外展，减少背阔肌下沿的刺激。",
+      "身体晃动借力。",
+      "使用重量过大导致无法控制动作。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "seated_cable_row",
+    "nameEn": "Seated Cable Row",
+    "nameZh": "坐姿绳索划船",
+    "equipmentId": "seated_row",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "middle back"
+    ],
+    "primaryMusclesZh": [
+      "中背部"
+    ],
+    "secondaryMuscles": [
+      "lats",
+      "biceps",
+      "forearms"
+    ],
+    "secondaryMusclesZh": [
+      "背阔肌",
+      "肱二头肌",
+      "前臂"
+    ],
+    "images": [
+      "Seated_Cable_Rows/0.jpg",
+      "Seated_Cable_Rows/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在划船机前，双脚踩实踏板，膝盖微弯。",
+      "双手握住V形手柄或直杆，手臂伸直，肩胛骨前伸。",
+      "背部挺直，核心收紧。",
+      "呼气，将手柄拉向腹部，手肘紧贴身体两侧向后。",
+      "在顶点挤压背部肌肉1秒，肩胛骨收紧。",
+      "吸气，缓慢回到起始位置，手臂完全伸直。"
+    ],
+    "commonMistakesZh": [
+      "利用身体前后晃动借力。",
+      "手肘过度外展，变成练肩的动作。",
+      "没有在顶点做顶峰收缩。",
+      "回放速度过快失去对重量的控制。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "close_grip_seated_row",
+    "nameEn": "Close-Grip Seated Row",
+    "nameZh": "窄握坐姿划船",
+    "equipmentId": "seated_row",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "middle back"
+    ],
+    "primaryMusclesZh": [
+      "中背部"
+    ],
+    "secondaryMuscles": [
+      "lats",
+      "biceps"
+    ],
+    "secondaryMusclesZh": [
+      "背阔肌",
+      "肱二头肌"
+    ],
+    "images": [
+      "Seated_Cable_Rows/0.jpg",
+      "Seated_Cable_Rows/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在划船机前，双脚踩实踏板，膝盖微弯。",
+      "双手对握窄握把手（V形手柄），手臂伸直。",
+      "背部挺直，核心收紧，身体略微前倾。",
+      "呼气，将把手拉向腹部，手肘紧贴身体向后。",
+      "在顶点用力挤压中背部1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "利用身体后仰借力。",
+      "手肘外展过多。",
+      "回放时含胸驼背。"
+    ],
+    "difficulty": "中级"
+  },
+  {
+    "id": "leg_press",
+    "nameEn": "Leg Press",
+    "nameZh": "腿举",
+    "equipmentId": "leg_press",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
+    "secondaryMusclesZh": [
+      "臀大肌",
+      "腘绳肌",
+      "小腿"
+    ],
+    "images": [
+      "Narrow_Stance_Leg_Press/0.jpg",
+      "Narrow_Stance_Leg_Press/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在腿举机上，背部紧贴靠垫，臀部不离开坐垫。",
+      "双脚与肩同宽踩在踏板中央。",
+      "双手握住两侧手柄，核心收紧。",
+      "解锁安全杆，吸气，缓慢屈膝下放踏板，直至膝盖呈约90度角。",
+      "呼气，脚掌发力将踏板推回起始位置，膝盖不完全锁死。",
+      "完成一组后锁定安全杆。"
+    ],
+    "commonMistakesZh": [
+      "下放过深导致臀部离开座椅。",
+      "推起时膝盖锁死，增加关节压力。",
+      "双脚位置过高或过低，影响目标肌群发力。",
+      "推起时利用惯性弹动。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "single_leg_leg_press",
+    "nameEn": "Single Leg Press",
+    "nameZh": "单腿腿举",
+    "equipmentId": "leg_press",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondaryMusclesZh": [
+      "臀大肌",
+      "腘绳肌"
+    ],
+    "images": [
+      "Narrow_Stance_Leg_Press/0.jpg",
+      "Narrow_Stance_Leg_Press/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在腿举机上，将一只脚踩在踏板中央位置。",
+      "另一只脚放松置于踏板下方或地面。",
+      "背部紧贴靠垫，双手握住两侧手柄。",
+      "吸气，单腿控制下放踏板至膝盖约90度。",
+      "呼气，单腿发力推回起始位置，膝盖不完全锁死。",
+      "完成目标次数后换腿。"
+    ],
+    "commonMistakesZh": [
+      "下放时身体歪斜，骨盆不平衡。",
+      "推起时膝盖过度锁死。",
+      "使用重量过大致使动作变形。",
+      "换边时没有调整好坐姿。"
+    ],
+    "difficulty": "中级"
+  },
+  {
+    "id": "cable_crossover_fly",
+    "nameEn": "Cable Crossover",
+    "nameZh": "绳索夹胸",
+    "equipmentId": "cable_crossover",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "primaryMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMusclesZh": [
+      "肩部"
+    ],
+    "images": [
+      "Cable_Crossover/0.jpg",
+      "Cable_Crossover/1.jpg"
+    ],
+    "stepsZh": [
+      "将两侧滑轮调至最高或与肩同高位置。",
+      "双手握住D形把手，向前走一步，身体略微前倾。",
+      "核心收紧，手肘微弯固定角度。",
+      "呼气，双手弧线向下向内夹至胸前交叉。",
+      "在顶点挤压胸肌1-2秒。",
+      "吸气，缓慢回到起始位置，感受胸肌拉伸。"
+    ],
+    "commonMistakesZh": [
+      "手肘角度变化过大，变成推的动作。",
+      "身体前后晃动借力。",
+      "肩膀耸起代偿。",
+      "回放速度过快丢失肌肉张力。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "cable_face_pull",
+    "nameEn": "Cable Face Pull",
+    "nameZh": "绳索面拉",
+    "equipmentId": "cable_crossover",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "primaryMusclesZh": [
+      "肩部"
+    ],
+    "secondaryMuscles": [
+      "traps",
+      "upper back"
+    ],
+    "secondaryMusclesZh": [
+      "斜方肌",
+      "上背部"
+    ],
+    "images": [
+      "Face_Pull/0.jpg",
+      "Face_Pull/1.jpg"
+    ],
+    "stepsZh": [
+      "将绳索滑轮调至与面部同高或略高。",
+      "双手握住绳索两端，后退一步保持绳索张力。",
+      "双手伸直向前，掌心相对。",
+      "呼气，将绳索拉向面部，双手分开至耳朵两侧。",
+      "在顶点挤压上背部和后肩1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "使用重量过大导致动作变形。",
+      "手肘低于肩膀，减少了后束的刺激。",
+      "身体后仰借力。",
+      "拉到面部时双手过度靠近。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "smith_squat",
+    "nameEn": "Smith Machine Squat",
+    "nameZh": "史密斯深蹲",
+    "equipmentId": "smith_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondaryMusclesZh": [
+      "臀大肌",
+      "腘绳肌"
+    ],
+    "images": [
+      "Smith_Machine_Squat/0.jpg",
+      "Smith_Machine_Squat/1.jpg"
+    ],
+    "stepsZh": [
+      "调整杠铃高度至肩部位置，装上合适重量。",
+      "将杠铃置于肩部斜方肌上，双手正握杠铃杆。",
+      "旋转杠铃解锁，双脚与肩同宽站立。",
+      "吸气，屈髋屈膝下蹲至大腿与地面平行或略低。",
+      "呼气，脚掌发力站起，膝盖不完全锁死。",
+      "动作结束后旋转杠铃锁定。"
+    ],
+    "commonMistakesZh": [
+      "下蹲时膝盖过度超过脚尖。",
+      "背部没有保持挺直，含胸弓背。",
+      "站起时膝盖完全锁死。",
+      "杠铃位置过高压迫颈椎。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "smith_bench_press",
+    "nameEn": "Smith Machine Bench Press",
+    "nameZh": "史密斯卧推",
+    "equipmentId": "smith_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "primaryMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "secondaryMusclesZh": [
+      "肱三头肌",
+      "肩部"
+    ],
+    "images": [
+      "Smith_Machine_Bench_Press/0.jpg",
+      "Smith_Machine_Bench_Press/1.jpg"
+    ],
+    "stepsZh": [
+      "将平板凳放在史密斯机中央，调整杠铃高度。",
+      "躺在凳上，双手握杠铃杆，握距略宽于肩。",
+      "旋转杠铃解锁，将杠铃举至胸部正上方。",
+      "吸气，缓慢下放杠铃至触碰胸部。",
+      "呼气，胸肌发力推起杠铃至手臂微弯。",
+      "完成一组后旋转杠铃锁定。"
+    ],
+    "commonMistakesZh": [
+      "杠铃下放过高，没有触碰胸部。",
+      "推起时手肘过度锁死。",
+      "臀部离开凳面借力。",
+      "杠铃轨迹歪斜。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "leg_extension_ex",
+    "nameEn": "Leg Extension",
+    "nameZh": "坐姿腿屈伸",
+    "equipmentId": "leg_extension",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Leg_Extensions/0.jpg",
+      "Leg_Extensions/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在腿屈伸机上，背部紧贴靠垫。",
+      "调整挡板位置使其位于脚踝上方。",
+      "双手握住两侧手柄，核心收紧。",
+      "呼气，伸膝将挡板向上抬起至腿几乎伸直。",
+      "在顶点挤压股四头肌1-2秒。",
+      "吸气，缓慢下放回起始位置。"
+    ],
+    "commonMistakesZh": [
+      "动作速度过快，使用惯性。",
+      "顶点膝盖完全锁死。",
+      "下放时完全放松让重量自由下落。",
+      "身体后倾借力。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "leg_curl_ex",
+    "nameEn": "Leg Curl",
+    "nameZh": "俯卧腿弯举",
+    "equipmentId": "leg_curl",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "primaryMusclesZh": [
+      "腘绳肌"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "secondaryMusclesZh": [
+      "小腿"
+    ],
+    "images": [
+      "Lying_Leg_Curls/0.jpg",
+      "Lying_Leg_Curls/1.jpg"
+    ],
+    "stepsZh": [
+      "俯卧在腿弯举机上，膝盖对准器械旋转轴。",
+      "将挡板置于脚踝后方。",
+      "双手握住手柄，核心收紧。",
+      "呼气，屈膝将挡板向上抬起，尽量靠近臀部。",
+      "在顶点挤压腘绳肌1秒。",
+      "吸气，缓慢下放回起始位置。"
+    ],
+    "commonMistakesZh": [
+      "髋部抬起离开凳面。",
+      "动作速度过快甩动重量。",
+      "顶点没有充分收缩。",
+      "使用重量过大，臀部代偿。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "machine_chest_press",
+    "nameEn": "Machine Chest Press",
+    "nameZh": "坐姿推胸",
+    "equipmentId": "chest_press_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "primaryMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "secondaryMusclesZh": [
+      "肱三头肌",
+      "肩部"
+    ],
+    "images": [
+      "Cable_Chest_Press/0.jpg",
+      "Cable_Chest_Press/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在推胸机上，调整座椅使手柄对准胸部中间。",
+      "背部紧贴靠垫，双手握住手柄。",
+      "呼气，胸肌发力将手柄向前推至手臂微弯。",
+      "在顶点挤压胸肌1秒。",
+      "吸气，缓慢回到起始位置，感受胸肌拉伸。"
+    ],
+    "commonMistakesZh": [
+      "推举时肩胛骨没有收紧。",
+      "手臂完全伸直锁死肘关节。",
+      "回放速度过快。",
+      "含胸驼背，胸部发力感不足。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "pec_deck_fly",
+    "nameEn": "Pec Deck Fly",
+    "nameZh": "蝴蝶机夹胸",
+    "equipmentId": "pec_deck",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "primaryMusclesZh": [
+      "胸部"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMusclesZh": [
+      "肩部"
+    ],
+    "images": [
+      "Butterfly/0.jpg",
+      "Butterfly/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在蝴蝶机上，调整座椅使手柄对准胸部高度。",
+      "背部贴紧靠垫，双手握住两侧手柄，前臂贴紧垫板。",
+      "呼气，胸部发力将手柄向中间合拢。",
+      "在顶点挤压胸肌1-2秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "手臂发力过多，胸部发力感不足。",
+      "身体离开靠垫借力。",
+      "回放太快，丢失肌肉张力。",
+      "手肘角度改变，变成推的动作。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "machine_shoulder_press",
+    "nameEn": "Machine Shoulder Press",
+    "nameZh": "坐姿肩推",
+    "equipmentId": "shoulder_press_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "primaryMusclesZh": [
+      "肩部"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMusclesZh": [
+      "肱三头肌"
+    ],
+    "images": [
+      "Smith_Machine_Overhead_Shoulder_Press/0.jpg",
+      "Smith_Machine_Overhead_Shoulder_Press/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在肩推机上，调整座椅使手柄对准肩部高度。",
+      "背部贴紧靠垫，双手握住手柄。",
+      "呼气，肩部发力向上推起至手臂微弯。",
+      "在顶点挤压肩部1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "上推时耸肩代偿。",
+      "手臂完全伸直锁死。",
+      "下放过低使肩部过度拉伸。",
+      "背部离开靠垫。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "assisted_pull_up_ex",
+    "nameEn": "Assisted Pull-Up",
+    "nameZh": "辅助引体向上",
+    "equipmentId": "assisted_pull_up",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "lats"
+    ],
+    "primaryMusclesZh": [
+      "背阔肌"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "middle back"
+    ],
+    "secondaryMusclesZh": [
+      "肱二头肌",
+      "中背部"
+    ],
+    "images": [
+      "Band_Assisted_Pull-Up/0.jpg",
+      "Band_Assisted_Pull-Up/1.jpg"
+    ],
+    "stepsZh": [
+      "跪在或站在辅助垫上，调整辅助重量。",
+      "双手正握横杆，握距宽于肩。",
+      "身体自然悬垂，肩胛骨下沉。",
+      "呼气，背部发力将身体向上拉起，下巴过杆。",
+      "在顶点挤压背阔肌1秒。",
+      "吸气，缓慢下放至手臂伸直。"
+    ],
+    "commonMistakesZh": [
+      "下放过快，突然松力。",
+      "借助身体晃动上拉。",
+      "含胸驼背，背部没有收紧。",
+      "握距过窄或过宽。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hack_squat_ex",
+    "nameEn": "Hack Squat",
+    "nameZh": "哈克深蹲",
+    "equipmentId": "hack_squat",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "secondaryMusclesZh": [
+      "臀大肌"
+    ],
+    "images": [
+      "Barbell_Hack_Squat/0.jpg",
+      "Barbell_Hack_Squat/1.jpg"
+    ],
+    "stepsZh": [
+      "站在哈克深蹲机上，双肩抵住肩垫。",
+      "双脚与肩同宽踩在踏板上。",
+      "解锁安全手柄，核心收紧。",
+      "吸气，缓慢屈膝下蹲至大腿与踏板平行。",
+      "呼气，脚掌发力站起至膝盖微弯。",
+      "结束后锁定安全手柄。"
+    ],
+    "commonMistakesZh": [
+      "下蹲时膝盖过度超过脚尖。",
+      "动作到底时臀部离开靠垫。",
+      "站起时膝盖锁死。",
+      "脚跟抬起离地。"
+    ],
+    "difficulty": "中级"
+  },
+  {
+    "id": "seated_calf_raise",
+    "nameEn": "Seated Calf Raise",
+    "nameZh": "坐姿提踵",
+    "equipmentId": "calf_raise",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "primaryMusclesZh": [
+      "小腿"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Barbell_Seated_Calf_Raise/0.jpg",
+      "Barbell_Seated_Calf_Raise/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在小腿训练机上，脚尖踩在踏板边缘。",
+      "将大腿垫调整至膝盖上方。",
+      "双手握住手柄解锁安全杆。",
+      "呼气，脚尖发力向上踮起，充分收缩小腿。",
+      "在顶点停留1-2秒。",
+      "吸气，缓慢下放至最大限度拉伸小腿。"
+    ],
+    "commonMistakesZh": [
+      "动作幅度太小，没有充分拉伸和收缩。",
+      "借助身体晃动借力。",
+      "速度过快。",
+      "脚跟位置不正。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hip_abduction_ex",
+    "nameEn": "Hip Abduction",
+    "nameZh": "坐姿髋外展",
+    "equipmentId": "hip_abduction",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "glutes"
+    ],
+    "primaryMusclesZh": [
+      "臀大肌"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Thigh_Abductor/0.jpg",
+      "Thigh_Abductor/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在髋外展机上，背部贴紧靠垫。",
+      "双腿外侧抵住挡板。",
+      "双手握住两侧手柄。",
+      "呼气，双腿向外打开至最大幅度。",
+      "在顶点挤压臀部外侧1-2秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "动作速度过快。",
+      "身体前倾或离开靠垫借力。",
+      "使用重量过大导致动作幅度不足。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "hip_adduction_ex",
+    "nameEn": "Hip Adduction",
+    "nameZh": "坐姿髋内收",
+    "equipmentId": "hip_adduction",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "adductors"
+    ],
+    "primaryMusclesZh": [
+      "大腿内收肌群"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Thigh_Adductor/0.jpg",
+      "Thigh_Adductor/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在髋内收机上，背部贴紧靠垫。",
+      "双腿内侧抵住挡板。",
+      "双手握住两侧手柄。",
+      "呼气，双腿向内夹拢至挡板接触。",
+      "在顶点挤压内侧肌群1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "动作速度过快使用惯性。",
+      "身体晃动借力。",
+      "幅度不足，没有完全夹拢。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "machine_bicep_curl",
+    "nameEn": "Machine Bicep Curl",
+    "nameZh": "坐姿二头弯举",
+    "equipmentId": "bicep_curl_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "primaryMusclesZh": [
+      "肱二头肌"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Machine_Bicep_Curl/0.jpg",
+      "Machine_Bicep_Curl/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在二头弯举机上，上臂平放在垫板上。",
+      "双手反握握住手柄，掌心向上。",
+      "呼气，二头发力将手柄向上弯举至肩部。",
+      "在顶点挤压二头肌1秒。",
+      "吸气，缓慢下放至手臂微弯。"
+    ],
+    "commonMistakesZh": [
+      "上臂离开垫板。",
+      "下放时手臂完全伸直放松。",
+      "借助身体后仰借力。",
+      "速度过快。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "tricep_pushdown_ex",
+    "nameEn": "Tricep Pushdown",
+    "nameZh": "绳索下压",
+    "equipmentId": "tricep_pushdown",
+    "equipmentType": "cable",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "primaryMusclesZh": [
+      "肱三头肌"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Triceps_Pushdown_-_Rope_Attachment/0.jpg",
+      "Triceps_Pushdown_-_Rope_Attachment/1.jpg"
+    ],
+    "stepsZh": [
+      "将绳索滑轮调至最高位置。",
+      "双手握住绳索两端或直杆，手肘紧贴身体两侧。",
+      "起始位置双手在胸部高度，手肘弯曲约90度。",
+      "呼气，三头发力将绳索向下压至手臂伸直。",
+      "在顶点挤压三头肌1秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "手肘外展离开身体两侧。",
+      "借助身体前倾下压。",
+      "回放过快丢失肌肉张力。",
+      "手腕卷曲代偿。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "machine_crunch",
+    "nameEn": "Machine Crunch",
+    "nameZh": "器械卷腹",
+    "equipmentId": "ab_crunch_machine",
+    "equipmentType": "plate_loaded",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "primaryMusclesZh": [
+      "腹直肌"
+    ],
+    "secondaryMuscles": [],
+    "secondaryMusclesZh": [],
+    "images": [
+      "Ab_Crunch_Machine/0.jpg",
+      "Ab_Crunch_Machine/1.jpg"
+    ],
+    "stepsZh": [
+      "坐在卷腹机上，调整座椅高度。",
+      "双手握住上方把手，前臂贴紧垫板。",
+      "腹部收紧，背部贴紧靠垫。",
+      "呼气，腹部发力向前卷曲身体，肩胛骨离开靠垫。",
+      "在顶点挤压腹部1-2秒。",
+      "吸气，缓慢回到起始位置。"
+    ],
+    "commonMistakesZh": [
+      "用手臂发力拉动而不是腹部卷曲。",
+      "回放时完全放松腹部。",
+      "颈部过度用力。",
+      "速度过快。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "treadmill_run",
+    "nameEn": "Treadmill Running",
+    "nameZh": "跑步机跑步",
+    "equipmentId": "treadmill",
+    "equipmentType": "cardio",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "calves",
+      "glutes"
+    ],
+    "secondaryMusclesZh": [
+      "腘绳肌",
+      "小腿",
+      "臀大肌"
+    ],
+    "images": [
+      "Running_Treadmill/0.jpg",
+      "Running_Treadmill/1.jpg"
+    ],
+    "stepsZh": [
+      "站在跑步机两侧踏板上，按下启动按钮。",
+      "待跑带开始低速运转后，双脚踩上跑带开始步行。",
+      "逐步调高速度至合适的跑步配速。",
+      "保持身体直立，目视前方，自然摆臂。",
+      "需要时调节坡度增加强度。",
+      "结束前逐步减速，待跑带慢速后踩回两侧踏板。"
+    ],
+    "commonMistakesZh": [
+      "跑步时低头看屏幕。",
+      "步幅过大，脚跟先着地。",
+      "身体过度前倾或后仰。",
+      "紧急停止夹没有夹在衣物上。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "treadmill_walk",
+    "nameEn": "Treadmill Walking",
+    "nameZh": "跑步机爬坡走",
+    "equipmentId": "treadmill",
+    "equipmentType": "cardio",
+    "primaryMuscles": [
+      "glutes"
+    ],
+    "primaryMusclesZh": [
+      "臀大肌"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "calves"
+    ],
+    "secondaryMusclesZh": [
+      "腘绳肌",
+      "小腿"
+    ],
+    "images": [
+      "Walking_Treadmill/0.jpg",
+      "Walking_Treadmill/1.jpg"
+    ],
+    "stepsZh": [
+      "设置跑步机坡度为8-12%，速度3-5 km/h。",
+      "双手自然摆臂，不要扶扶手。",
+      "步幅适中，脚掌先着地。",
+      "保持核心收紧，身体略微前倾。",
+      "保持20-40分钟，结束时逐步降低坡度。"
+    ],
+    "commonMistakesZh": [
+      "过度依赖扶手，降低训练效果。",
+      "步幅太小，臀部发力不足。",
+      "坡度设置过低，达不到训练强度。"
+    ],
+    "difficulty": "新手友好"
+  },
+  {
+    "id": "elliptical_ex",
+    "nameEn": "Elliptical Training",
+    "nameZh": "椭圆机有氧",
+    "equipmentId": "elliptical",
+    "equipmentType": "cardio",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "primaryMusclesZh": [
+      "股四头肌"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "glutes",
+      "calves"
+    ],
+    "secondaryMusclesZh": [
+      "腘绳肌",
+      "臀大肌",
+      "小腿"
+    ],
+    "images": [
+      "Elliptical_Trainer/0.jpg",
+      "Elliptical_Trainer/1.jpg"
+    ],
+    "stepsZh": [
+      "站上椭圆机踏板，双手握住活动扶手。",
+      "开始踩踏，保持身体直立。",
+      "调节阻力至合适强度。",
+      "正向踩踏锻炼股四头肌，反向踩踏锻炼腘绳肌和臀部。",
+      "保持20-40分钟。"
+    ],
+    "commonMistakesZh": [
+      "身体过度倚靠扶手。",
+      "脚尖发力过多，脚跟抬起。",
+      "阻力设置过低。",
+      "踩踏节奏不稳定。"
+    ],
+    "difficulty": "新手友好"
+  }
+]

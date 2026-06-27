@@ -76,6 +76,18 @@
 		F4A5586CF74B68AB93F8D05B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDB3F5D1CB4B0DB8B8BA2D8 /* SettingsView.swift */; };
 		FDFA479C75FC2142A2FF93EA /* PRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC29DBE6D4A73AB3900BDDB1 /* PRService.swift */; };
 		FE4143448838DFEDE64352BC /* Muscle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BF4E7FBDA39AB2BAEA9FAD /* Muscle.swift */; };
+
+			B10000000000000000000001 /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* Equipment.swift */; };
+			B20000000000000000000001 /* ExerciseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* ExerciseInfo.swift */; };
+			B30000000000000000000001 /* LocalExerciseDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000001 /* LocalExerciseDataService.swift */; };
+			B40000000000000000000001 /* EquipmentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000000000000000000001 /* EquipmentDetailView.swift */; };
+			B50000000000000000000001 /* equipments.json in Resources */ = {isa = PBXBuildFile; fileRef = A50000000000000000000001 /* equipments.json */; };
+			B60000000000000000000001 /* exercises.json in Resources */ = {isa = PBXBuildFile; fileRef = A60000000000000000000001 /* exercises.json */; };
+			B70000000000000000000001 /* muscle_zh_map.json in Resources */ = {isa = PBXBuildFile; fileRef = A70000000000000000000001 /* muscle_zh_map.json */; };
+
+			C30000000000000000000001 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* FlowLayout.swift */; };
+			C40000000000000000000001 /* AsyncExerciseImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* AsyncExerciseImageView.swift */; };
+			C60000000000000000000001 /* ExerciseImages in Resources */ = {isa = PBXBuildFile; fileRef = C50000000000000000000001 /* ExerciseImages */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -148,6 +160,18 @@
 		E70CBC7D0A47E1018148A297 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		EA7E471BBC6A9A30B90D8511 /* MuscleMapFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleMapFallbackView.swift; sourceTree = "<group>"; };
 		F7488DDE16031AE0301E2E9F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+
+			A10000000000000000000001 /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
+			A20000000000000000000001 /* ExerciseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfo.swift; sourceTree = "<group>"; };
+			A30000000000000000000001 /* LocalExerciseDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalExerciseDataService.swift; sourceTree = "<group>"; };
+			A40000000000000000000001 /* EquipmentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipmentDetailView.swift; sourceTree = "<group>"; };
+			A50000000000000000000001 /* equipments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = equipments.json; sourceTree = "<group>"; };
+			A60000000000000000000001 /* exercises.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = exercises.json; sourceTree = "<group>"; };
+			A70000000000000000000001 /* muscle_zh_map.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = muscle_zh_map.json; sourceTree = "<group>"; };
+
+			C10000000000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+			C20000000000000000000001 /* AsyncExerciseImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncExerciseImageView.swift; sourceTree = "<group>"; };
+			C50000000000000000000001 /* ExerciseImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ExerciseImages; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +241,8 @@
 			children = (
 				8ABE520D189BB8AAA6B8C7BF /* HapticManager.swift */,
 				7915A04B06CBBFD074F8BB37 /* Theme.swift */,
+				C10000000000000000000001 /* FlowLayout.swift */,
+				C20000000000000000000001 /* AsyncExerciseImageView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -281,6 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				DC29DBE6D4A73AB3900BDDB1 /* PRService.swift */,
+				A30000000000000000000001 /* LocalExerciseDataService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -289,8 +316,20 @@
 			isa = PBXGroup;
 			children = (
 				F7488DDE16031AE0301E2E9F /* Assets.xcassets */,
+				A80000000000000000000001 /* Data */,
+				C50000000000000000000001 /* ExerciseImages */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A80000000000000000000001 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				A50000000000000000000001 /* equipments.json */,
+				A60000000000000000000001 /* exercises.json */,
+				A70000000000000000000001 /* muscle_zh_map.json */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		7AA9413D8D2C6463D462E283 /* Rendering */ = {
@@ -337,6 +376,8 @@
 				3B0A1D93FD4F6E148D8D5373 /* Workout.swift */,
 				D9A767AD0FBFA24267914210 /* WorkoutExercise.swift */,
 				CD10C7FC76DF0F544781E0E3 /* WorkoutTemplate.swift */,
+				A10000000000000000000001 /* Equipment.swift */,
+				A20000000000000000000001 /* ExerciseInfo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -402,6 +443,7 @@
 				DBDD499DB8F43AA2F2F3AE7C /* MuscleGroupMapper.swift */,
 				EA7E471BBC6A9A30B90D8511 /* MuscleMapFallbackView.swift */,
 				D2A541C3AE25B7037F674395 /* MuscleMapSectionView.swift */,
+				A40000000000000000000001 /* EquipmentDetailView.swift */,
 			);
 			path = ExerciseLibrary;
 			sourceTree = "<group>";
@@ -492,6 +534,10 @@
 				2E2D0D165F9A4598EA9852EF /* FitRock_Icon.svg in Resources */,
 				C3139895F3B4C60220734111 /* FitRock_Icon_Preview.png in Resources */,
 				08491F807479F11762B760D2 /* README.md in Resources */,
+				B50000000000000000000001 /* equipments.json in Resources */,
+				B60000000000000000000001 /* exercises.json in Resources */,
+				B70000000000000000000001 /* muscle_zh_map.json in Resources */,
+				C60000000000000000000001 /* ExerciseImages in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,6 +612,12 @@
 				57F34FCF9864216D9C25A52C /* MuscleTooltip.swift in Sources */,
 				4E0D45E58CB468903E55CE2F /* SelectionHistory.swift in Sources */,
 				88A84FB1935BB42D74BDB771 /* ZoomableBodyContainer.swift in Sources */,
+				B10000000000000000000001 /* Equipment.swift in Sources */,
+				B20000000000000000000001 /* ExerciseInfo.swift in Sources */,
+				B30000000000000000000001 /* LocalExerciseDataService.swift in Sources */,
+				B40000000000000000000001 /* EquipmentDetailView.swift in Sources */,
+				C30000000000000000000001 /* FlowLayout.swift in Sources */,
+				C40000000000000000000001 /* AsyncExerciseImageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
