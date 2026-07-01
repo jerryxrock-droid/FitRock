@@ -2,20 +2,15 @@ import SwiftUI
 
 struct StatsView: View {
     @StateObject private var viewModel = StatsViewModel()
-    @State private var selectedPeriod: StatsPeriod = .week
-    @State private var showDeleteAlert = false
-    @State private var workoutToDelete: Workout?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Theme.Spacing.md) {
-                    periodPicker
                     overviewCards
                     personalRecordsSection
                     muscleHeatmapSection
                     trainingPlanReviewSection
-                    workoutHistory
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -33,31 +28,8 @@ struct StatsView: View {
             }
         }
         .onAppear {
-            viewModel.loadStats(for: selectedPeriod)
+            viewModel.loadStats(for: .all)
         }
-        .onChange(of: selectedPeriod) { newValue in
-            viewModel.loadStats(for: newValue)
-        }
-        .alert("确认删除", isPresented: $showDeleteAlert) {
-            Button("取消", role: .cancel) { }
-            Button("删除", role: .destructive) {
-                if let workout = workoutToDelete {
-                    viewModel.deleteWorkout(workout.id)
-                }
-            }
-        } message: {
-            Text("确定要删除这次训练记录吗？")
-        }
-    }
-
-    private var periodPicker: some View {
-        Picker("时间范围", selection: $selectedPeriod) {
-            ForEach(StatsPeriod.allCases, id: \.self) { period in
-                Text(period.rawValue).tag(period)
-            }
-        }
-        .pickerStyle(.segmented)
-        .frame(maxWidth: .infinity)
     }
 
     private var overviewCards: some View {
@@ -371,63 +343,6 @@ struct StatsView: View {
         .padding()
         .background(Theme.Colors.surface2)
         .cornerRadius(Theme.CornerRadius.small)
-    }
-
-    private var workoutHistory: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("训练历史")
-                .font(Theme.Fonts.headline)
-                .foregroundColor(Theme.Colors.textPrimary)
-
-            if viewModel.workouts.isEmpty {
-                Text(viewModel.workoutCount == 0 ? "完成第一次训练后会显示历史记录" : "暂无数据")
-                    .font(Theme.Fonts.body)
-                    .foregroundColor(Theme.Colors.textMuted)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                ForEach(viewModel.workouts) { workout in
-                    HStack(spacing: Theme.Spacing.sm) {
-                        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                            HStack {
-                                Text(workout.formattedDate)
-                                    .font(Theme.Fonts.body)
-                                    .foregroundColor(Theme.Colors.textPrimary)
-                                Spacer()
-                                Text(workout.formattedDuration)
-                                    .font(Theme.Fonts.caption)
-                                    .foregroundColor(Theme.Colors.textMuted)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Button(role: .destructive) {
-                            workoutToDelete = workout
-                            showDeleteAlert = true
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.body)
-                                .foregroundColor(Theme.Colors.error.opacity(0.7))
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("删除训练")
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Theme.Colors.surface2)
-                    .cornerRadius(Theme.CornerRadius.small)
-                    .contentShape(Rectangle())
-                    .accessibilityAction(named: "删除") {
-                        workoutToDelete = workout
-                        showDeleteAlert = true
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Theme.Colors.surface)
-        .cornerRadius(Theme.CornerRadius.medium)
     }
 
     private func displayName(for muscle: Muscle) -> String {

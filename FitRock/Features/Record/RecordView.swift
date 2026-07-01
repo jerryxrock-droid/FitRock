@@ -220,11 +220,6 @@ struct RecordView: View {
                 onSkip: { updatePlanSessionStatus($0, status: .skipped) }
             )
             .padding(.horizontal, Theme.Spacing.xl)
-        } else {
-            NoPlanCard {
-                showTrainingManagement = true
-            }
-            .padding(.horizontal, Theme.Spacing.xl)
         }
     }
 
@@ -743,41 +738,6 @@ private struct WeeklyPlanSessionRow: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "M月d日 HH:mm"
         return formatter.string(from: date)
-    }
-}
-
-private struct NoPlanCard: View {
-    let onGenerate: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            HStack(spacing: Theme.Spacing.sm) {
-                Image(systemName: "calendar.badge.plus")
-                    .foregroundColor(Theme.Colors.accent)
-                Text("还没有训练计划")
-                    .font(Theme.Fonts.headline)
-                    .foregroundColor(Theme.Colors.textPrimary)
-            }
-
-            Text("根据目标、每周天数和单次时长生成 4 周安排，之后每天都能从这里直接开始。")
-                .font(Theme.Fonts.body)
-                .foregroundColor(Theme.Colors.textMuted)
-                .lineSpacing(3)
-
-            Button(action: onGenerate) {
-                Label("生成4周计划", systemImage: "sparkles")
-                    .font(Theme.Fonts.body)
-                    .foregroundColor(Theme.Colors.accent)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Theme.Colors.accent.opacity(0.12))
-                    .cornerRadius(Theme.CornerRadius.small)
-            }
-        }
-        .padding()
-        .background(Theme.Colors.surface)
-        .cornerRadius(Theme.CornerRadius.medium)
-        .accessibilityIdentifier("no-plan-card")
     }
 }
 

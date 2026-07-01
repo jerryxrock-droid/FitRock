@@ -106,13 +106,23 @@ final class FitRockUITests: XCTestCase {
         app.tabBars.buttons["统计"].tap()
         XCTAssertTrue(app.staticTexts["肌肉热力图"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["计划复盘"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["本周"].exists)
+        XCTAssertFalse(app.buttons["本月"].exists)
+        XCTAssertFalse(app.staticTexts["训练历史"].exists)
         XCTAssertFalse(app.buttons["生成计划"].exists)
         XCTAssertFalse(app.buttons["调整计划"].exists)
         XCTAssertFalse(app.staticTexts["动作排行榜"].exists)
     }
 
+    func testCalendarShowsRecentWorkoutsEntryByDefault() {
+        app.tabBars.buttons["日历"].tap()
+        XCTAssertTrue(app.staticTexts["最近训练"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["训练历史"].exists)
+    }
+
     func testTrainingPlanUsesWeeklyPoolEntry() {
         app.tabBars.buttons["训练"].tap()
+        XCTAssertFalse(app.staticTexts["还没有训练计划"].exists)
         if app.buttons["训练管理"].waitForExistence(timeout: 3) {
             app.buttons["训练管理"].tap()
             XCTAssertTrue(app.navigationBars["训练管理"].waitForExistence(timeout: 5))

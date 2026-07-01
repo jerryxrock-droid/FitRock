@@ -180,16 +180,4 @@ final class StatsViewModel: ObservableObject {
         personalRecords = []
         workouts = []
     }
-
-    func deleteWorkout(_ workoutId: String) {
-        do {
-            try workoutRepository.connect()
-            try workoutRepository.deleteWorkout(workoutId)
-            try prService.rebuildAllPersonalRecords()
-            loadStats(for: .week)
-            Haptic.medium.trigger()
-        } catch {
-            print("Error deleting workout: \(error)")
-        }
-    }
 }

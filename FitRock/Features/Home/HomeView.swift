@@ -4,6 +4,8 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var displayedMonth = Date()
     @State private var selectedDate: Date?
+    @State private var showDeleteAlert = false
+    @State private var workoutToDelete: Workout?
 
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
 
@@ -13,7 +15,7 @@ struct HomeView: View {
                 VStack(spacing: Theme.Spacing.md) {
                     statCards
                     calendarSection
-                    selectedDateWorkouts
+                    workoutHistorySection
                 }
                 .padding()
             }
@@ -30,6 +32,16 @@ struct HomeView: View {
         }
         .onAppear {
             viewModel.loadData(for: displayedMonth)
+        }
+        .alert("确认删除", isPresented: $showDeleteAlert) {
+            Button("取消", role: .cancel) { }
+            Button("删除", role: .destructive) {
+                if let workout = workoutToDelete {
+                    viewModel.deleteWorkout(workout.id, displayedMonth: displayedMonth)
+                }
+            }
+        } message: {
+            Text("确定要删除这次训练记录吗？")
         }
     }
 
@@ -80,9 +92,10 @@ struct HomeView: View {
                             onTap: {
                                 if selectedDate != nil && Calendar.current.isDate(date, inSameDayAs: selectedDate!) {
                                     selectedDate = nil
-                                } else {
-                                    selectedDate = date
+                                    viewModel.clearSelectedDate()
+                                    return
                                 }
+                                selectedDate = date
                                 viewModel.selectDate(date)
                             }
                         )
@@ -97,31 +110,61 @@ struct HomeView: View {
         .cornerRadius(Theme.CornerRadius.medium)
     }
 
-    @ViewBuilder
-    private var selectedDateWorkouts: some View {
-        if let selected = selectedDate {
-            VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-                Text("\(formatDate(selected))的训练")
-                    .font(Theme.Fonts.headline)
-                    .foregroundColor(Theme.Colors.textPrimary)
+    private var workoutHistorySection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            if let selected = selectedDate {
+                selectedDateWorkoutList(selected)
+            } else {
+                recentWorkoutList
+            }
+        }
+        .padding()
+        .background(Theme.Colors.surface)
+        .cornerRadius(Theme.CornerRadius.medium)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
 
-                if viewModel.selectedDateWorkouts.isEmpty {
-                    EmptyStateView(
-                        icon: "figure.run",
-                        title: "暂无训练记录",
-                        message: "开始第一次训练吧！"
-                    )
-                } else {
-                    ForEach(viewModel.selectedDateWorkouts) { workout in
-                        WorkoutSummaryCard(workout: workout)
-                    }
+    @ViewBuilder
+    private func selectedDateWorkoutList(_ selected: Date) -> some View {
+        Text("\(formatDate(selected))的训练")
+            .font(Theme.Fonts.headline)
+            .foregroundColor(Theme.Colors.textPrimary)
+
+        if viewModel.selectedDateWorkouts.isEmpty {
+            EmptyStateView(
+                icon: "figure.run",
+                title: "暂无训练记录",
+                message: "开始第一次训练吧！"
+            )
+        } else {
+            ForEach(viewModel.selectedDateWorkouts) { workout in
+                WorkoutSummaryCard(workout: workout) {
+                    workoutToDelete = workout
+                    showDeleteAlert = true
                 }
             }
-            .padding()
-            .background(Theme.Colors.surface)
-            .cornerRadius(Theme.CornerRadius.medium)
-            .transition(.opacity.combined(with: .move(edge: .top)))
-            .animation(.easeInOut(duration: 0.2), value: selectedDate)
+        }
+    }
+
+    @ViewBuilder
+    private var recentWorkoutList: some View {
+        Text("最近训练")
+            .font(Theme.Fonts.headline)
+            .foregroundColor(Theme.Colors.textPrimary)
+
+        if viewModel.recentWorkouts.isEmpty {
+            EmptyStateView(
+                icon: "figure.run",
+                title: "暂无训练记录",
+                message: "完成第一次训练后会显示最近 3 次训练"
+            )
+        } else {
+            ForEach(viewModel.recentWorkouts) { workout in
+                WorkoutSummaryCard(workout: workout) {
+                    workoutToDelete = workout
+                    showDeleteAlert = true
+                }
+            }
         }
     }
 
@@ -237,36 +280,56 @@ struct CalendarDayView: View {
 
 struct WorkoutSummaryCard: View {
     let workout: Workout
+    var onDelete: (() -> Void)?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-            HStack {
-                Text(workout.formattedDate)
-                    .font(Theme.Fonts.headline)
-                    .foregroundColor(Theme.Colors.textPrimary)
-                Spacer()
-                Text(workout.formattedDuration)
+        HStack(spacing: Theme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                HStack {
+                    Text(workout.formattedDate)
+                        .font(Theme.Fonts.headline)
+                        .foregroundColor(Theme.Colors.textPrimary)
+                    Spacer()
+                    Text(workout.formattedDuration)
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textSecondary)
+                }
+
+                Text(formatExerciseList())
                     .font(Theme.Fonts.caption)
-                    .foregroundColor(Theme.Colors.textSecondary)
+                    .foregroundColor(Theme.Colors.textMuted)
+                    .lineLimit(2)
+
+                HStack(spacing: Theme.Spacing.md) {
+                    Label(String(format: "%.1f", Double(workout.totalVolume) / 1000) + "T", systemImage: "scalemass")
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textSecondary)
+                    Label("\(workout.totalSets)组", systemImage: "number")
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textSecondary)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(formatExerciseList())
-                .font(Theme.Fonts.caption)
-                .foregroundColor(Theme.Colors.textMuted)
-                .lineLimit(2)
-
-            HStack(spacing: Theme.Spacing.md) {
-                Label(String(format: "%.1f", Double(workout.totalVolume) / 1000) + "T", systemImage: "scalemass")
-                    .font(Theme.Fonts.caption)
-                    .foregroundColor(Theme.Colors.textSecondary)
-                Label("\(workout.totalSets)组", systemImage: "number")
-                    .font(Theme.Fonts.caption)
-                    .foregroundColor(Theme.Colors.textSecondary)
+            if let onDelete {
+                Button(role: .destructive, action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.body)
+                        .foregroundColor(Theme.Colors.error.opacity(0.7))
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("删除训练")
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.Colors.surface2)
         .cornerRadius(Theme.CornerRadius.small)
+        .contentShape(Rectangle())
+        .accessibilityAction(named: "删除") {
+            onDelete?()
+        }
     }
 
     private func formatExerciseList() -> String {
