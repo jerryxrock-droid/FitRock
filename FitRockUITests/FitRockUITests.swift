@@ -35,6 +35,20 @@ final class FitRockUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["快速记录每一组"].waitForExistence(timeout: 5))
     }
 
+    func testSettingsShowsPrivacyAndDisclaimer() {
+        app.tabBars.buttons["统计"].tap()
+        app.navigationBars.buttons["设置"].tap()
+
+        waitAndTap("隐私与健康数据")
+        XCTAssertTrue(app.staticTexts["本地优先"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["不用于广告"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons["设置"].tap()
+
+        waitAndTap("训练免责声明")
+        XCTAssertTrue(app.staticTexts["训练建议性质"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["必要时咨询专业人士"].waitForExistence(timeout: 5))
+    }
+
     func testLaunchAndTabNavigation() {
         XCTAssertTrue(app.tabBars.buttons["日历"].waitForExistence(timeout: 5))
 

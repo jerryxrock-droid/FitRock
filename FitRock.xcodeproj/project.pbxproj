@@ -99,6 +99,7 @@
 		AEEF9FFF36FA623FF5F4C189 /* ExerciseCatalogHistoryResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907645F1C8C1AF2C2C5BA278 /* ExerciseCatalogHistoryResolverTests.swift */; };
 		B07516B847578492F192DE7C /* StatsCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAA1C54FBE2BDDB0ED35F80 /* StatsCalculator.swift */; };
 		B3C4FC1F28FCB6036EA93E5F /* ZoomableBodyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F07728FDEB78BB61D04B1998 /* ZoomableBodyContainer.swift */; };
+		B3CEFD1CE362034849414C70 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1BCE37551F30A6655583B8F4 /* PrivacyInfo.xcprivacy */; };
 		B564FD404BBB900A201DA131 /* SamplePreviewDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF06AA1F9F6E81E01E51173B /* SamplePreviewDataTests.swift */; };
 		BAE714CA25C7452D62D60DBC /* StatsEmptyPreviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E73BDA66B033B02214537B0 /* StatsEmptyPreviewTests.swift */; };
 		BD9F1E82EC40CD8CEF907A85 /* MuscleHeatmapCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEF75BAF1AFD8BF2EAA7DBD /* MuscleHeatmapCalculator.swift */; };
@@ -170,6 +171,7 @@
 		17BA854EF7B85829F2FA1A92 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		199F09BD26B612C5742E9689 /* FitRockUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitRockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1ACEBCB4135008FA9611B3A9 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		1BCE37551F30A6655583B8F4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1D2BF3CF41EDE07305410C69 /* ExerciseCatalogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalogItem.swift; sourceTree = "<group>"; };
 		1E988FCD9352ED370591489D /* ExerciseTeachingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTeachingData.swift; sourceTree = "<group>"; };
 		20C567412A3F289BE5B489B1 /* MuscleSide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleSide.swift; sourceTree = "<group>"; };
@@ -541,6 +543,7 @@
 			isa = PBXGroup;
 			children = (
 				288CCF6BA4EB0BAB6D46A37B /* FitRock.entitlements */,
+				1BCE37551F30A6655583B8F4 /* PrivacyInfo.xcprivacy */,
 				35B51E6BA105A7CE7244818B /* App */,
 				09A7E7244430ECE84A94D968 /* AppIcon */,
 				C65FC8DCA6C426A568F5EFD7 /* Core */,
@@ -799,6 +802,7 @@
 				2E2D0D165F9A4598EA9852EF /* FitRock_Icon.svg in Resources */,
 				C3139895F3B4C60220734111 /* FitRock_Icon_Preview.png in Resources */,
 				C538A399CFEF7D450A9C5BB4 /* Localizable.strings in Resources */,
+				B3CEFD1CE362034849414C70 /* PrivacyInfo.xcprivacy in Resources */,
 				08491F807479F11762B760D2 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1126,7 +1130,9 @@
 				CODE_SIGN_ENTITLEMENTS = FitRock/FitRock.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 可读取体重、心率和活动能量，用于生成更贴近状态的训练计划建议。";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1145,7 +1151,9 @@
 				CODE_SIGN_ENTITLEMENTS = FitRock/FitRock.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 可读取体重、心率和活动能量，用于生成更贴近状态的训练计划建议。";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
