@@ -183,9 +183,9 @@ xcodebuild test \
 
 > "implement, break, fix" — 写代码前先想清楚为什么这么写，写完故意找漏洞，修，再写下一个。
 
-- **本地优先** — 不连云就不会有云断的那一天
-- **显式优于隐式** — SQLite.swift 写 SQL，不靠 ORM 推测
-- **可恢复优于可丢弃** — App 被强杀？下次启动弹窗恢复训练
+- **本地优先** 
+- **显式优于隐式** 
+- **可恢复优于可丢弃** 
 
 ---
 
@@ -211,7 +211,7 @@ Issue / PR 都欢迎。但请遵守：
 
 ## 📜 License
 
-MIT License — 你拿去改、用、卖都行，别告我就行。
+MIT License
 
 ---
 
@@ -220,6 +220,5 @@ MIT License — 你拿去改、用、卖都行，别告我就行。
 **谢捷 (Jie Xie)** · [@jerryxrock-droid](https://github.com/jerryxrock-droid)
 
 10 年车联网产品经理转型中。FitRock 是我学习 SwiftUI / Combine / SQLite 的练手项目——
-它能跑起来是因为 iOS 16+ 终于让 SwiftUI 像个样子了。
 
 如果这个项目帮到了你训练，点个 ⭐ 是最大的支持。
