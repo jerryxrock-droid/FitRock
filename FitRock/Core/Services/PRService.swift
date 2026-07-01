@@ -2,18 +2,28 @@ import Foundation
 
 final class PRService {
     static let shared = PRService()
-    private let db = DatabaseManager.shared
+    private let personalRecordRepository: PersonalRecordRepository
+    private let exerciseRepository: ExerciseRepository
+    private let workoutRepository: WorkoutRepository
 
     private var tempIdCounter: Int64 = 0
 
-    private init() {}
+    init(
+        personalRecordRepository: PersonalRecordRepository = DatabaseManager.shared,
+        exerciseRepository: ExerciseRepository = DatabaseManager.shared,
+        workoutRepository: WorkoutRepository = DatabaseManager.shared
+    ) {
+        self.personalRecordRepository = personalRecordRepository
+        self.exerciseRepository = exerciseRepository
+        self.workoutRepository = workoutRepository
+    }
 
     /// Evaluate a workout and return any new PR events without saving
     func evaluate(workout: Workout) throws -> [PersonalRecordEvent] {
         var events: [PersonalRecordEvent] = []
 
         for we in workout.exercises {
-            let exercise = try db.getExercise(by: we.exerciseId)
+            let exercise = try exerciseRepository.getExercise(by: we.exerciseId)
             try evaluateExercise(workoutExercise: we, unit: exercise?.unit ?? .weight, workout: workout, events: &events)
         }
 
@@ -42,8 +52,8 @@ final class PRService {
                 createdAt: Date(),
                 updatedAt: Date()
             )
-            try db.savePersonalRecord(record)
-            try db.savePersonalRecordEvent(event)
+            try personalRecordRepository.savePersonalRecord(record)
+            try personalRecordRepository.savePersonalRecordEvent(event)
         }
 
         return events
@@ -51,9 +61,9 @@ final class PRService {
 
     /// Rebuild all personal records from scratch (used after workout deletion)
     func rebuildAllPersonalRecords() throws {
-        try db.clearAllPersonalRecords()
+        try personalRecordRepository.clearAllPersonalRecords()
 
-        let allWorkouts = try db.getAllCompletedWorkouts()
+        let allWorkouts = try workoutRepository.getAllCompletedWorkouts()
 
         var bestMaxWeight: [String: (value: Double, set: ExerciseSet, workout: Workout, we: WorkoutExercise)] = [:]
         var bestVolume: [String: (value: Double, workout: Workout, we: WorkoutExercise)] = [:]
@@ -66,7 +76,7 @@ final class PRService {
 
                 let key = we.exerciseId
                 let workingSets = completedSets.filter { $0.setType != .warmup }
-                let exercise = try db.getExercise(by: we.exerciseId)
+                let exercise = try exerciseRepository.getExercise(by: we.exerciseId)
                 let unit = exercise?.unit ?? .weight
 
                 switch unit {
@@ -125,7 +135,7 @@ final class PRService {
                 createdAt: now,
                 updatedAt: now
             )
-            try db.savePersonalRecord(record)
+            try personalRecordRepository.savePersonalRecord(record)
         }
 
         for (exerciseId, data) in bestVolume {
@@ -146,7 +156,7 @@ final class PRService {
                 createdAt: now,
                 updatedAt: now
             )
-            try db.savePersonalRecord(record)
+            try personalRecordRepository.savePersonalRecord(record)
         }
 
         for (exerciseId, data) in bestDuration {
@@ -167,7 +177,7 @@ final class PRService {
                 createdAt: now,
                 updatedAt: now
             )
-            try db.savePersonalRecord(record)
+            try personalRecordRepository.savePersonalRecord(record)
         }
     }
 
@@ -186,7 +196,7 @@ final class PRService {
         case .weight:
             // Max weight - best working set by weight
             if let maxSet = workingSets.max(by: { $0.weight < $1.weight }), maxSet.weight > 0 {
-                let currentBest = try db.getPersonalRecords(for: key)
+                let currentBest = try personalRecordRepository.getPersonalRecords(for: key)
                     .first { $0.prType == .maxWeight }
 
                 if currentBest == nil || maxSet.weight > currentBest!.value {
@@ -214,7 +224,7 @@ final class PRService {
             // Volume - sum of ALL completed sets (including dropsets)
             let totalVolume = completedSets.reduce(0) { $0 + ($1.weight * Double($1.reps)) }
             if totalVolume > 0 {
-                let currentBest = try db.getPersonalRecords(for: key)
+                let currentBest = try personalRecordRepository.getPersonalRecords(for: key)
                     .first { $0.prType == .exerciseVolume }
 
                 if currentBest == nil || totalVolume > currentBest!.value {
@@ -243,7 +253,7 @@ final class PRService {
             // Volume - sum of ALL completed sets
             let totalVolume = completedSets.reduce(0) { $0 + ($1.weight * Double($1.reps)) }
             if totalVolume > 0 {
-                let currentBest = try db.getPersonalRecords(for: key)
+                let currentBest = try personalRecordRepository.getPersonalRecords(for: key)
                     .first { $0.prType == .exerciseVolume }
 
                 if currentBest == nil || totalVolume > currentBest!.value {
@@ -271,7 +281,7 @@ final class PRService {
         case .duration:
             // Duration - best working set by weight (stores seconds value)
             if let maxSet = workingSets.max(by: { $0.weight < $1.weight }), maxSet.weight > 0 {
-                let currentBest = try db.getPersonalRecords(for: key)
+                let currentBest = try personalRecordRepository.getPersonalRecords(for: key)
                     .first { $0.prType == .duration }
 
                 if currentBest == nil || maxSet.weight > currentBest!.value {

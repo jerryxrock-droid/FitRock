@@ -10,8 +10,48 @@ final class StatsViewModel: ObservableObject {
     @Published var exerciseRanking: [ExerciseRankItem] = []
     @Published var personalRecords: [PersonalRecord] = []
     @Published var workouts: [Workout] = []
+    @Published var heatmapPeriod: HeatmapPeriod = .month
+    @Published var muscleHeatmapSummary = MuscleHeatmapSummary(intensities: [], overloaded: [], missing: [], rawVolumes: [:])
+    @Published var activeTrainingPlan: TrainingPlan?
+    @Published var planCompletion = TrainingPlanCompletion(completed: 0, skipped: 0, planned: 0, rest: 0)
+    @Published var healthSnapshot = HealthMetricsSnapshot.empty
 
-    private let db = DatabaseManager.shared
+    private let workoutRepository: WorkoutRepository
+    private let personalRecordRepository: PersonalRecordRepository
+    private let prService: PRService
+    private let statsCalculator: StatsCalculator
+    private let heatmapCalculator: MuscleHeatmapCalculator
+    private let planRepository: TrainingPlanRepository
+    private let planEngine: TrainingPlanRecommendationEngine
+    private let completionMatcher: TrainingPlanCompletionMatcher
+    private let healthProvider: HealthMetricsProviding
+    private let exerciseCatalogService: ExerciseCatalogProviding
+    private var allCompletedWorkouts: [Workout] = []
+    private var catalogItems: [ExerciseCatalogItem] = []
+
+    init(
+        workoutRepository: WorkoutRepository = DatabaseManager.shared,
+        personalRecordRepository: PersonalRecordRepository = DatabaseManager.shared,
+        prService: PRService = .shared,
+        statsCalculator: StatsCalculator = StatsCalculator(),
+        heatmapCalculator: MuscleHeatmapCalculator = MuscleHeatmapCalculator(),
+        planRepository: TrainingPlanRepository = UserDefaultsTrainingPlanRepository.shared,
+        planEngine: TrainingPlanRecommendationEngine = TrainingPlanRecommendationEngine(),
+        completionMatcher: TrainingPlanCompletionMatcher = TrainingPlanCompletionMatcher(),
+        healthProvider: HealthMetricsProviding = HealthKitService.shared,
+        exerciseCatalogService: ExerciseCatalogProviding? = nil
+    ) {
+        self.workoutRepository = workoutRepository
+        self.personalRecordRepository = personalRecordRepository
+        self.prService = prService
+        self.statsCalculator = statsCalculator
+        self.heatmapCalculator = heatmapCalculator
+        self.planRepository = planRepository
+        self.planEngine = planEngine
+        self.completionMatcher = completionMatcher
+        self.healthProvider = healthProvider
+        self.exerciseCatalogService = exerciseCatalogService ?? ExerciseCatalogService()
+    }
 
     var formattedTotalDuration: String {
         let minutes = Int(totalDuration) / 60
@@ -26,88 +66,107 @@ final class StatsViewModel: ObservableObject {
 
     func loadStats(for period: StatsPeriod) {
         do {
-            try db.connect()
-            let allWorkouts = try db.getAllCompletedWorkouts()
-
-            let filteredWorkouts: [Workout]
-            let now = Date()
-            let calendar = Calendar.current
-
-            switch period {
-            case .week:
-                let weekAgo = calendar.date(byAdding: .day, value: -7, to: now)!
-                filteredWorkouts = allWorkouts.filter { $0.startTime >= weekAgo }
-            case .month:
-                let monthAgo = calendar.date(byAdding: .month, value: -1, to: now)!
-                filteredWorkouts = allWorkouts.filter { $0.startTime >= monthAgo }
-            case .all:
-                filteredWorkouts = allWorkouts
-            }
-
-            calculateStats(from: filteredWorkouts, allWorkouts: allWorkouts)
-            workouts = Array(filteredWorkouts.prefix(10))
+            try workoutRepository.connect()
+            let allWorkouts = try workoutRepository.getAllCompletedWorkouts()
+            allCompletedWorkouts = allWorkouts
+            apply(statsCalculator.calculate(from: allWorkouts, period: period))
+            loadCatalogItems()
+            refreshHeatmap()
+            loadActivePlan()
+            loadPersonalRecords()
         } catch {
             print("Error loading stats: \(error)")
             resetStats()
         }
     }
 
-    private func calculateStats(from workouts: [Workout], allWorkouts: [Workout]) {
-        workoutCount = workouts.count
-        totalVolume = workouts.reduce(0) { $0 + $1.totalVolume }
-        totalSets = workouts.reduce(0) { $0 + $1.totalSets }
-        totalDuration = workouts.reduce(0) { $0 + $1.duration }
-
-        calculateBodyPartStats(from: workouts)
-        calculateExerciseRanking(from: workouts)
-        loadPersonalRecords()
+    func setHeatmapPeriod(_ period: HeatmapPeriod) {
+        heatmapPeriod = period
+        refreshHeatmap()
     }
 
-    private func calculateBodyPartStats(from workouts: [Workout]) {
-        var bodyPartVolumes: [BodyPart: Double] = [:]
-
-        for workout in workouts {
-            for we in workout.exercises {
-                let volume = we.sets.reduce(0) { $0 + ($1.weight * Double($1.reps)) }
-                bodyPartVolumes[we.bodyPart, default: 0] += volume
-            }
-        }
-
-        let total = bodyPartVolumes.values.reduce(0, +)
-
-        bodyPartData = bodyPartVolumes.map { bp, volume in
-            BodyPartStat(bodyPart: bp, volume: volume, percentage: total > 0 ? (volume / total) * 100 : 0)
-        }.sorted { $0.volume > $1.volume }
+    func generatePlan(goal: TrainingPlanGoal = .hypertrophy) {
+        generatePlan(preferences: TrainingPlanPreferences(goal: goal))
     }
 
-    private func calculateExerciseRanking(from workouts: [Workout]) {
-        var exerciseVolumes: [String: (name: String, volume: Double)] = [:]
-
-        for workout in workouts {
-            for we in workout.exercises {
-                let volume = we.sets.reduce(0) { $0 + ($1.weight * Double($1.reps)) }
-                let current = exerciseVolumes[we.exerciseName]?.volume ?? 0
-                exerciseVolumes[we.exerciseName] = (name: we.exerciseName, volume: current + volume)
+    func generatePlan(preferences: TrainingPlanPreferences) {
+        healthProvider.fetchSnapshot { [weak self] snapshot in
+            guard let self else { return }
+            self.healthSnapshot = snapshot
+            let plan = self.planEngine.recommend(
+                workouts: self.allCompletedWorkouts,
+                heatmapSummary: self.muscleHeatmapSummary,
+                preferences: preferences,
+                healthSnapshot: snapshot,
+                catalogItems: self.catalogItems
+            )
+            do {
+                try self.planRepository.savePlan(plan)
+                self.activeTrainingPlan = plan
+                self.planCompletion = self.completionMatcher.completion(plan: plan)
+            } catch {
+                print("Error saving training plan: \(error)")
             }
         }
+    }
 
-        exerciseRanking = exerciseVolumes.values
-            .sorted { $0.volume > $1.volume }
-            .prefix(10)
-            .map { ExerciseRankItem(name: $0.name, volume: $0.volume) }
+    func updatePlanDay(_ day: TrainingPlanDay, status: TrainingPlanDayStatus) {
+        guard let plan = activeTrainingPlan else { return }
+        do {
+            try planRepository.updateDayStatus(planId: plan.id, dayId: day.id, status: status, matchedWorkoutId: day.matchedWorkoutId)
+            loadActivePlan()
+        } catch {
+            print("Error updating plan day: \(error)")
+        }
+    }
+
+    private func apply(_ summary: StatsSummary) {
+        workoutCount = summary.workoutCount
+        totalVolume = summary.totalVolume
+        totalSets = summary.totalSets
+        totalDuration = summary.totalDuration
+        bodyPartData = summary.bodyPartData
+        exerciseRanking = summary.exerciseRanking
+        workouts = summary.recentWorkouts
     }
 
     private func loadPersonalRecords() {
         do {
-            var records = try db.getPersonalRecords()
+            var records = try personalRecordRepository.getPersonalRecords()
             if records.isEmpty {
-                try PRService.shared.rebuildAllPersonalRecords()
-                records = try db.getPersonalRecords()
+                try prService.rebuildAllPersonalRecords()
+                records = try personalRecordRepository.getPersonalRecords()
             }
             personalRecords = records
         } catch {
             print("Error loading personal records: \(error)")
             personalRecords = []
+        }
+    }
+
+    private func refreshHeatmap() {
+        muscleHeatmapSummary = heatmapCalculator.calculate(workouts: allCompletedWorkouts, period: heatmapPeriod)
+    }
+
+    private func loadActivePlan() {
+        do {
+            activeTrainingPlan = try planRepository.getActivePlan()
+            if let activeTrainingPlan {
+                planCompletion = completionMatcher.completion(plan: activeTrainingPlan)
+            } else {
+                planCompletion = TrainingPlanCompletion(completed: 0, skipped: 0, planned: 0, rest: 0)
+            }
+        } catch {
+            print("Error loading training plan: \(error)")
+        }
+    }
+
+    private func loadCatalogItems() {
+        do {
+            catalogItems = try exerciseCatalogService.loadCatalogItems()
+        } catch {
+            print("Error loading exercise catalog: \(error)")
+            catalogItems = []
         }
     }
 
@@ -124,32 +183,13 @@ final class StatsViewModel: ObservableObject {
 
     func deleteWorkout(_ workoutId: String) {
         do {
-            try db.connect()
-            try db.deleteWorkout(workoutId)
-            try PRService.shared.rebuildAllPersonalRecords()
+            try workoutRepository.connect()
+            try workoutRepository.deleteWorkout(workoutId)
+            try prService.rebuildAllPersonalRecords()
             loadStats(for: .week)
             Haptic.medium.trigger()
         } catch {
             print("Error deleting workout: \(error)")
         }
     }
-}
-
-struct BodyPartStat: Identifiable {
-    let id = UUID()
-    let bodyPart: BodyPart
-    let volume: Double
-    let percentage: Double
-}
-
-struct ExerciseRankItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let volume: Double
-}
-
-enum StatsPeriod: String, CaseIterable {
-    case week = "本周"
-    case month = "本月"
-    case all = "全部"
 }

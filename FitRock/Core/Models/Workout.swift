@@ -6,13 +6,25 @@ struct Workout: Identifiable, Codable {
     var endTime: Date?
     var exercises: [WorkoutExercise]
     var isCompleted: Bool
+    var trainingPlanId: String?
+    var plannedDayId: String?
 
-    init(id: String = UUID().uuidString, startTime: Date = Date(), endTime: Date? = nil, exercises: [WorkoutExercise] = [], isCompleted: Bool = false) {
+    init(
+        id: String = UUID().uuidString,
+        startTime: Date = Date(),
+        endTime: Date? = nil,
+        exercises: [WorkoutExercise] = [],
+        isCompleted: Bool = false,
+        trainingPlanId: String? = nil,
+        plannedDayId: String? = nil
+    ) {
         self.id = id
         self.startTime = startTime
         self.endTime = endTime
         self.exercises = exercises
         self.isCompleted = isCompleted
+        self.trainingPlanId = trainingPlanId
+        self.plannedDayId = plannedDayId
     }
 
     var duration: TimeInterval {

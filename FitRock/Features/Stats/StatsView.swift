@@ -1,5 +1,4 @@
 import SwiftUI
-import Charts
 
 struct StatsView: View {
     @StateObject private var viewModel = StatsViewModel()
@@ -14,10 +13,11 @@ struct StatsView: View {
                     periodPicker
                     overviewCards
                     personalRecordsSection
-                    bodyPartChart
-                    exerciseRanking
+                    muscleHeatmapSection
+                    trainingPlanReviewSection
                     workoutHistory
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             }
             .background(Theme.Colors.background)
@@ -28,6 +28,7 @@ struct StatsView: View {
                         Image(systemName: "gearshape")
                             .foregroundColor(Theme.Colors.textSecondary)
                     }
+                    .accessibilityLabel("设置")
                 }
             }
         }
@@ -56,6 +57,7 @@ struct StatsView: View {
             }
         }
         .pickerStyle(.segmented)
+        .frame(maxWidth: .infinity)
     }
 
     private var overviewCards: some View {
@@ -65,6 +67,7 @@ struct StatsView: View {
             StatsCard(title: "总时长", value: viewModel.formattedTotalDuration, icon: "clock")
             StatsCard(title: "总组数", value: "\(viewModel.totalSets)", icon: "number")
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var personalRecordsSection: some View {
@@ -81,6 +84,7 @@ struct StatsView: View {
                 Text("暂无纪录")
                     .font(Theme.Fonts.body)
                     .foregroundColor(Theme.Colors.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 let grouped = Dictionary(grouping: viewModel.personalRecords) { $0.exerciseName }
                 let bestRecords: [PersonalRecord] = grouped.values.compactMap { records in
@@ -101,87 +105,272 @@ struct StatsView: View {
                                 Text(pr.exerciseName)
                                     .font(Theme.Fonts.body)
                                     .foregroundColor(Theme.Colors.textPrimary)
+                                    .lineLimit(1)
                             }
                             if !pr.detailText.isEmpty {
                                 Text(pr.detailText)
                                     .font(Theme.Fonts.caption)
                                     .foregroundColor(Theme.Colors.textMuted)
+                                    .lineLimit(1)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         Spacer()
                         Text(pr.formattedValue)
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(Theme.Colors.accent)
+                            .lineLimit(1)
                     }
                     .padding(.vertical, Theme.Spacing.xs)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     if pr.id != bestRecords.last?.id {
                         Divider()
+                            .frame(maxWidth: .infinity)
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
     }
 
-    private var bodyPartChart: some View {
+    private var muscleHeatmapSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("部位分布")
-                .font(Theme.Fonts.headline)
-                .foregroundColor(Theme.Colors.textPrimary)
+            HStack {
+                Text("肌肉热力图")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textPrimary)
+                Spacer()
+                Picker("范围", selection: Binding(
+                    get: { viewModel.heatmapPeriod },
+                    set: { viewModel.setHeatmapPeriod($0) }
+                )) {
+                    ForEach(HeatmapPeriod.allCases, id: \.self) { period in
+                        Text(period.rawValue).tag(period)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(Theme.Colors.accent)
+            }
 
-            if viewModel.bodyPartData.isEmpty {
-                Text("暂无数据")
+            if viewModel.muscleHeatmapSummary.intensities.isEmpty {
+                Text(viewModel.workoutCount == 0 ? "完成第一次训练后生成肌肉热力图" : "暂无肌肉训练量数据")
                     .font(Theme.Fonts.body)
                     .foregroundColor(Theme.Colors.textMuted)
-                    .frame(height: 150)
+                    .frame(height: 180)
                     .frame(maxWidth: .infinity)
             } else {
-                PieChartView(data: viewModel.bodyPartData)
-                    .frame(height: 200)
+                heatmapBodyViews
+
+                heatmapSummaryRows
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
     }
 
-    private var exerciseRanking: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("动作排行榜")
-                .font(Theme.Fonts.headline)
-                .foregroundColor(Theme.Colors.textPrimary)
+    private var heatmapBodyViews: some View {
+        HStack(spacing: Theme.Spacing.md) {
+            heatmapBodyView(title: "正面", side: .front)
+            heatmapBodyView(title: "背面", side: .back)
+        }
+        .accessibilityElement(children: .contain)
+    }
 
-            if viewModel.exerciseRanking.isEmpty {
-                Text("暂无数据")
-                    .font(Theme.Fonts.body)
+    private func heatmapBodyView(title: String, side: BodySide) -> some View {
+        VStack(spacing: Theme.Spacing.xs) {
+            Text(title)
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+            BodyView(gender: .male, side: side)
+                .heatmap(viewModel.muscleHeatmapSummary.intensities)
+                .frame(height: 260)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityIdentifier("heatmap-\(title)")
+    }
+
+    private var heatmapSummaryRows: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            if !viewModel.muscleHeatmapSummary.overloaded.isEmpty {
+                Text("偏重：" + viewModel.muscleHeatmapSummary.overloaded.map(displayName).joined(separator: "、"))
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(Theme.Colors.warning)
+            }
+            if !viewModel.muscleHeatmapSummary.missing.isEmpty {
+                Text("遗漏：" + viewModel.muscleHeatmapSummary.missing.map(displayName).joined(separator: "、"))
+                    .font(Theme.Fonts.caption)
                     .foregroundColor(Theme.Colors.textMuted)
-            } else {
-                ForEach(Array(viewModel.exerciseRanking.enumerated()), id: \.element.id) { index, item in
-                    HStack {
-                        Text("\(index + 1)")
-                            .font(Theme.Fonts.caption)
-                            .foregroundColor(Theme.Colors.textMuted)
-                            .frame(width: 20)
-                        Text(item.name)
-                            .font(Theme.Fonts.body)
-                            .foregroundColor(Theme.Colors.textPrimary)
-                        Spacer()
-                        Text("\(Int(item.volume))kg")
-                            .font(Theme.Fonts.body)
-                            .foregroundColor(Theme.Colors.accent)
-                    }
-                    .padding(.vertical, Theme.Spacing.xs)
-                    if index < viewModel.exerciseRanking.count - 1 {
-                        Divider()
-                    }
-                }
             }
         }
+    }
+
+    private var trainingPlanReviewSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            HStack {
+                Text("计划复盘")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textPrimary)
+                Spacer()
+            }
+
+            if let plan = viewModel.activeTrainingPlan {
+                VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(plan.name)
+                                .font(Theme.Fonts.body)
+                                .foregroundColor(Theme.Colors.textPrimary)
+                            Text("\(formattedDate(plan.startDate)) 开始 · 4 周训练池")
+                                .font(Theme.Fonts.caption)
+                                .foregroundColor(Theme.Colors.textMuted)
+                        }
+                        Spacer()
+                        Text("\(Int(viewModel.planCompletion.completionRate * 100))%")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(Theme.Colors.accent)
+                    }
+
+                    ProgressView(value: viewModel.planCompletion.completionRate)
+                        .tint(Theme.Colors.accent)
+
+                    planConfigurationSummary(plan)
+
+                    Text(plan.recommendationReason)
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textMuted)
+                        .lineSpacing(3)
+
+                    planFocusSummary(plan)
+
+                    ForEach(plan.weeks) { week in
+                        planWeekView(week)
+                    }
+                }
+            } else {
+                emptyPlanContent
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
+    }
+
+    private var emptyPlanContent: some View {
+        VStack(spacing: Theme.Spacing.sm) {
+            Image(systemName: "calendar.badge.plus")
+                .font(.title2)
+                .foregroundColor(Theme.Colors.textMuted)
+            Text(viewModel.workoutCount == 0 ? "可在训练页生成 4 周计划，让每天训练更明确" : "基于历史训练、肌肉热力图和可选健康数据复盘计划完成情况")
+                .font(Theme.Fonts.body)
+                .foregroundColor(Theme.Colors.textMuted)
+                .multilineTextAlignment(.center)
+
+        }
+        .padding(.vertical, Theme.Spacing.md)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func planConfigurationSummary(_ plan: TrainingPlan) -> some View {
+        HStack(spacing: 8) {
+            planSummaryChip(plan.goal.displayName)
+            planSummaryChip("每周 \(plan.trainingDaysPerWeek) 天")
+            if let minutes = plan.recommendedSessionMinutes {
+                planSummaryChip("\(minutes) 分钟")
+            }
+            planSummaryChip((plan.equipmentPreference ?? .noPreference).displayName)
+        }
+    }
+
+    private func planSummaryChip(_ title: String) -> some View {
+        Text(title)
+            .font(Theme.Fonts.caption)
+            .foregroundColor(Theme.Colors.accent)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Theme.Colors.accent.opacity(0.12))
+            .cornerRadius(6)
+    }
+
+    private func planFocusSummary(_ plan: TrainingPlan) -> some View {
+        let notes = Array(Set(plan.weeks.flatMap { $0.days.compactMap(\.note) }))
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("本周期重点")
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+            Text(notes.prefix(3).joined(separator: " "))
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textSecondary)
+                .lineLimit(3)
+        }
+        .padding()
+        .background(Theme.Colors.surface2)
+        .cornerRadius(Theme.CornerRadius.small)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func planWeekView(_ week: TrainingPlanWeek) -> some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            Text("第 \(week.weekIndex) 周")
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+
+            let trainingSessions = week.days.filter(\.isTrainingSession)
+            let completed = trainingSessions.filter { $0.status == .completed }.count
+            Text("完成 \(completed)/\(trainingSessions.count)")
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+
+            ForEach(trainingSessions) { day in
+                HStack(spacing: Theme.Spacing.sm) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text("第 \(day.sequenceIndex ?? 1) 练 · \(day.title)")
+                                .font(Theme.Fonts.body)
+                                .foregroundColor(day.status == .rest ? Theme.Colors.textMuted : Theme.Colors.textPrimary)
+                            planSummaryChip(strategyLabel(for: day))
+                        }
+                        if !day.suggestedExerciseNames.isEmpty {
+                            Text(day.suggestedExerciseNames.prefix(4).joined(separator: " / "))
+                                .font(Theme.Fonts.caption)
+                                .foregroundColor(Theme.Colors.textMuted)
+                                .lineLimit(1)
+                        }
+                        if let note = day.note {
+                            Text(note)
+                                .font(Theme.Fonts.caption)
+                                .foregroundColor(Theme.Colors.textMuted)
+                                .lineLimit(1)
+                        }
+                    }
+                    Spacer()
+                    Menu {
+                        Button("标记完成") { viewModel.updatePlanDay(day, status: .completed) }
+                        Button("跳过") { viewModel.updatePlanDay(day, status: .skipped) }
+                        Button("调整") { viewModel.updatePlanDay(day, status: .moved) }
+                        Button("计划中") { viewModel.updatePlanDay(day, status: .planned) }
+                    } label: {
+                        Text(day.status.displayName)
+                            .font(Theme.Fonts.caption)
+                            .foregroundColor(color(for: day.status))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(color(for: day.status).opacity(0.12))
+                            .cornerRadius(6)
+                    }
+                    .disabled(day.status == .rest)
+                }
+                .padding(.vertical, 6)
+            }
+        }
+        .padding()
+        .background(Theme.Colors.surface2)
+        .cornerRadius(Theme.CornerRadius.small)
     }
 
     private var workoutHistory: some View {
@@ -191,12 +380,13 @@ struct StatsView: View {
                 .foregroundColor(Theme.Colors.textPrimary)
 
             if viewModel.workouts.isEmpty {
-                Text("暂无数据")
+                Text(viewModel.workoutCount == 0 ? "完成第一次训练后会显示历史记录" : "暂无数据")
                     .font(Theme.Fonts.body)
                     .foregroundColor(Theme.Colors.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 ForEach(viewModel.workouts) { workout in
-                    HStack {
+                    HStack(spacing: Theme.Spacing.sm) {
                         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                             HStack {
                                 Text(workout.formattedDate)
@@ -208,27 +398,90 @@ struct StatsView: View {
                                     .foregroundColor(Theme.Colors.textMuted)
                             }
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Theme.Colors.surface2)
-                        .cornerRadius(Theme.CornerRadius.small)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Image(systemName: "trash")
-                            .font(.body)
-                            .foregroundColor(Theme.Colors.error.opacity(0.7))
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                workoutToDelete = workout
-                                showDeleteAlert = true
-                            }
+                        Button(role: .destructive) {
+                            workoutToDelete = workout
+                            showDeleteAlert = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.body)
+                                .foregroundColor(Theme.Colors.error.opacity(0.7))
+                                .frame(width: 44, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("删除训练")
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.Colors.surface2)
+                    .cornerRadius(Theme.CornerRadius.small)
+                    .contentShape(Rectangle())
+                    .accessibilityAction(named: "删除") {
+                        workoutToDelete = workout
+                        showDeleteAlert = true
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
+    }
+
+    private func displayName(for muscle: Muscle) -> String {
+        switch muscle {
+        case .abs, .upperAbs, .lowerAbs: return "腹肌"
+        case .biceps: return "肱二头肌"
+        case .calves: return "小腿"
+        case .chest, .upperChest, .lowerChest: return "胸部"
+        case .deltoids, .frontDeltoid, .rearDeltoid: return "肩部"
+        case .forearm: return "前臂"
+        case .gluteal: return "臀部"
+        case .hamstring: return "腘绳肌"
+        case .lowerBack: return "下背部"
+        case .obliques: return "腹斜肌"
+        case .quadriceps, .innerQuad, .outerQuad: return "股四头肌"
+        case .trapezius, .upperTrapezius, .lowerTrapezius: return "斜方肌"
+        case .triceps: return "肱三头肌"
+        case .upperBack, .rhomboids: return "上背部"
+        case .adductors: return "内收肌"
+        case .hipFlexors: return "髋屈肌"
+        default: return muscle.rawValue
+        }
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return formatter.string(from: date)
+    }
+
+    private func shortDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E M/d"
+        formatter.locale = Locale(identifier: "zh_Hans_CN")
+        return formatter.string(from: date)
+    }
+
+    private func color(for status: TrainingPlanDayStatus) -> Color {
+        switch status {
+        case .completed: return Theme.Colors.success
+        case .skipped: return Theme.Colors.error
+        case .moved: return Theme.Colors.warning
+        case .rest: return Theme.Colors.textMuted
+        case .planned: return Theme.Colors.accent
+        }
+    }
+
+    private func strategyLabel(for day: TrainingPlanDay) -> String {
+        guard let note = day.note else { return "计划" }
+        if note.contains("适应") { return "适应" }
+        if note.contains("容量") { return "容量" }
+        if note.contains("强度") { return "强度" }
+        if note.contains("Deload") || note.contains("deload") { return "Deload" }
+        return "计划"
     }
 }
 
@@ -257,93 +510,4 @@ struct StatsCard: View {
 
 #Preview {
     StatsView()
-}
-
-// MARK: - PieChartView
-struct PieChartView: View {
-    let data: [BodyPartStat]
-
-    var body: some View {
-        GeometryReader { geometry in
-            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            let radius = min(geometry.size.width, geometry.size.height) / 2 * 0.45
-
-            ZStack {
-                // Pie slices
-                ForEach(Array(slices.enumerated()), id: \.offset) { index, slice in
-                    PieSlice(startAngle: slice.startAngle, endAngle: slice.endAngle)
-                        .fill(data[index].bodyPart.themeColor)
-                }
-
-                // Center circle (donut hole)
-                Circle()
-                    .fill(Theme.Colors.background)
-                    .frame(width: radius * 1.2, height: radius * 1.2)
-
-                // Labels outside slices
-                ForEach(Array(sliceMidAngles.enumerated()), id: \.offset) { index, midAngle in
-                    let labelRadius = radius * 1.6
-                    let x = center.x + labelRadius * cos(CGFloat(midAngle) * .pi / 180)
-                    let y = center.y + labelRadius * sin(CGFloat(midAngle) * .pi / 180)
-
-                    if data[index].percentage >= 8 {
-                        VStack(spacing: 1) {
-                            Text(data[index].bodyPart.displayName)
-                                .font(.system(size: 9))
-                                .foregroundColor(Theme.Colors.textPrimary)
-                            Text("\(Int(data[index].percentage))%")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(data[index].bodyPart.themeColor)
-                        }
-                        .position(x: x, y: y)
-                    }
-                }
-            }
-        }
-    }
-
-    private var sliceMidAngles: [Double] {
-        slices.map { ($0.startAngle.degrees + $0.endAngle.degrees) / 2 }
-    }
-
-    private var slices: [(startAngle: Angle, endAngle: Angle)] {
-        var result: [(startAngle: Angle, endAngle: Angle)] = []
-        let total = data.reduce(0) { $0 + $1.volume }
-        var currentAngle: Double = -90
-
-        for item in data {
-            let percentage = total > 0 ? item.volume / total : 0
-            let angleSize = percentage * 360
-            result.append((
-                startAngle: Angle(degrees: currentAngle),
-                endAngle: Angle(degrees: currentAngle + angleSize)
-            ))
-            currentAngle += angleSize
-        }
-
-        return result
-    }
-}
-
-struct PieSlice: Shape {
-    let startAngle: Angle
-    let endAngle: Angle
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
-
-        path.move(to: center)
-        path.addArc(
-            center: center,
-            radius: radius,
-            startAngle: startAngle,
-            endAngle: endAngle,
-            clockwise: false
-        )
-        path.closeSubpath()
-
-        return path
-    }
 }

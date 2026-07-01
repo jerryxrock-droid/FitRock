@@ -4,11 +4,33 @@ final class ExerciseLibraryViewModel: ObservableObject {
     @Published var exercises: [Exercise] = []
     @Published var searchText = ""
     @Published var selectedBodyPart: BodyPart?
+    @Published var selectedMuscle: Muscle?
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var addToWorkoutResult: AddToWorkoutResult?
+    @Published var catalogItems: [ExerciseCatalogItem] = []
 
-    private let db = DatabaseManager.shared
+    private let exerciseRepository: ExerciseRepository
+    private let workoutRepository: WorkoutRepository
+    private let localExerciseDataService: LocalExerciseDataProviding
+    private let exerciseCatalogService: ExerciseCatalogProviding
+    private let catalogFilter = ExerciseCatalogSearchFilter()
+    private let searchScorer = ExerciseSearchScorer()
+
+    init(
+        exerciseRepository: ExerciseRepository = DatabaseManager.shared,
+        workoutRepository: WorkoutRepository = DatabaseManager.shared,
+        localExerciseDataService: LocalExerciseDataProviding = LocalExerciseDataService.shared,
+        exerciseCatalogService: ExerciseCatalogProviding? = nil
+    ) {
+        self.exerciseRepository = exerciseRepository
+        self.workoutRepository = workoutRepository
+        self.localExerciseDataService = localExerciseDataService
+        self.exerciseCatalogService = exerciseCatalogService ?? ExerciseCatalogService(
+            exerciseRepository: exerciseRepository,
+            localExerciseDataService: localExerciseDataService
+        )
+    }
 
     enum AddToWorkoutResult {
         case addedToExisting
@@ -16,8 +38,18 @@ final class ExerciseLibraryViewModel: ObservableObject {
     }
 
     var filteredExercises: [Exercise] {
-        var result = exercises
+        if !catalogItems.isEmpty {
+            return catalogFilter
+                .filter(
+                    catalogItems,
+                    searchText: searchText,
+                    selectedBodyPart: selectedBodyPart,
+                    selectedMuscle: selectedMuscle
+                )
+                .compactMap(exerciseForCatalogItem)
+        }
 
+        var result = exercises
         if let bp = selectedBodyPart {
             result = result.filter { $0.bodyPart == bp }
         }
@@ -29,17 +61,24 @@ final class ExerciseLibraryViewModel: ObservableObject {
         return result
     }
 
+    var filteredCatalogItems: [ExerciseCatalogItem] {
+        catalogFilter.filter(
+            catalogItems,
+            searchText: searchText,
+            selectedBodyPart: selectedBodyPart,
+            selectedMuscle: selectedMuscle
+        )
+    }
+
+    func clearMuscleFilters() {
+        selectedBodyPart = nil
+        selectedMuscle = nil
+    }
+
     // MARK: - Equipment Mode
 
     var filteredEquipments: [Equipment] {
-        let dataService = LocalExerciseDataService.shared
-        if searchText.isEmpty {
-            return dataService.equipments
-        }
-        return dataService.equipments.filter {
-            $0.nameZh.localizedCaseInsensitiveContains(searchText) ||
-            $0.nameEn.localizedCaseInsensitiveContains(searchText)
-        }
+        searchScorer.sortedEquipments(localExerciseDataService.equipments, query: searchText)
     }
 
     func loadExercises() {
@@ -47,11 +86,13 @@ final class ExerciseLibraryViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            try db.connect()
-            exercises = try db.getAllExercises()
+            try exerciseRepository.connect()
+            exercises = try exerciseRepository.getAllExercises()
+            catalogItems = try exerciseCatalogService.loadCatalogItems()
         } catch {
             errorMessage = "加载动作失败：\(error.localizedDescription)"
             exercises = []
+            catalogItems = []
         }
 
         isLoading = false
@@ -60,11 +101,11 @@ final class ExerciseLibraryViewModel: ObservableObject {
     // MARK: - Add to Workout
 
     func addExerciseToWorkout(_ exercise: Exercise) throws {
-        try db.connect()
+        try workoutRepository.connect()
 
-        if try db.hasUnfinishedWorkout() {
+        if try workoutRepository.hasUnfinishedWorkout() {
             // Add to existing workout
-            guard var workout = try db.getUnfinishedWorkout() else {
+            guard var workout = try workoutRepository.getUnfinishedWorkout() else {
                 throw ExerciseLibraryError.noWorkoutFound
             }
 
@@ -74,7 +115,7 @@ final class ExerciseLibraryViewModel: ObservableObject {
                 bodyPart: exercise.bodyPart
             )
             workout.exercises.append(workoutExercise)
-            try db.saveWorkout(workout)
+            try workoutRepository.saveWorkout(workout)
 
             addToWorkoutResult = .addedToExisting
         } else {
@@ -86,10 +127,21 @@ final class ExerciseLibraryViewModel: ObservableObject {
                 bodyPart: exercise.bodyPart
             )
             workout.exercises.append(workoutExercise)
-            try db.saveWorkout(workout)
+            try workoutRepository.saveWorkout(workout)
 
             addToWorkoutResult = .startedNewWorkout
         }
+    }
+
+    private func exerciseForCatalogItem(_ item: ExerciseCatalogItem) -> Exercise? {
+        guard let bodyPart = item.bodyPart else { return nil }
+        return Exercise(
+            id: item.recordExerciseId,
+            name: item.nameZh,
+            bodyPart: bodyPart,
+            isUserCreated: item.isUserCreated,
+            unit: item.unit
+        )
     }
 }
 

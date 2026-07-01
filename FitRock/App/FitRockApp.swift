@@ -14,7 +14,21 @@ struct FitRockApp: App {
                 .environmentObject(appState)
                 .preferredColorScheme(.dark)
                 .onAppear {
+                    if ProcessInfo.processInfo.arguments.contains("--reset-ui-data") {
+                        UserDefaults.standard.removeObject(forKey: "fitrock.activeTrainingPlan")
+                    }
                     appState.checkForUnfinishedWorkout()
+                    appState.showOnboardingIfNeeded()
+                }
+                .fullScreenCover(isPresented: $appState.showOnboarding) {
+                    OnboardingView(
+                        onStartFirstWorkout: {
+                            appState.completeOnboarding(startFirstWorkout: true)
+                        },
+                        onFinish: {
+                            appState.completeOnboarding(startFirstWorkout: false)
+                        }
+                    )
                 }
                 .alert("检测到未保存的训练", isPresented: $appState.showRecoveryAlert) {
                     Button("恢复训练") {
@@ -66,8 +80,18 @@ final class AppState: ObservableObject {
     @Published var shouldResumeWorkout = false
     @Published var selectedTab = 0
     @Published var workoutStartedExternally = false
+    @Published var showOnboarding = false
 
-    private let db = DatabaseManager.shared
+    private let db: WorkoutRepository
+    private let onboardingStore: OnboardingStateStore
+
+    init(
+        db: WorkoutRepository = DatabaseManager.shared,
+        onboardingStore: OnboardingStateStore = .shared
+    ) {
+        self.db = db
+        self.onboardingStore = onboardingStore
+    }
 
     func checkForUnfinishedWorkout() {
         do {
@@ -77,6 +101,8 @@ final class AppState: ObservableObject {
                 if unfinishedWorkout != nil {
                     showRecoveryAlert = true
                 }
+            } else {
+                clearRecoveryState()
             }
         } catch {
             print("Error checking for unfinished workout: \(error)")
@@ -86,6 +112,7 @@ final class AppState: ObservableObject {
     func resumeWorkout() {
         shouldResumeWorkout = true
         showRecoveryAlert = false
+        selectedTab = 1
     }
 
     func discardUnfinishedWorkout() {
@@ -93,7 +120,44 @@ final class AppState: ObservableObject {
         if let workout = unfinishedWorkout {
             try? db.deleteWorkout(workout.id)
         }
+        clearRecoveryState()
+    }
+
+    func markWorkoutCompleted(_ workoutId: String?) {
+        guard workoutId == nil || unfinishedWorkout?.id == workoutId else { return }
+        clearRecoveryState()
+    }
+
+    func showOnboardingIfNeeded() {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--skip-onboarding") {
+            onboardingStore.markSeen()
+            showOnboarding = false
+            return
+        }
+        if arguments.contains("--reset-onboarding") {
+            onboardingStore.resetForReplay()
+        }
+        guard !onboardingStore.hasSeenOnboarding else { return }
+        showOnboarding = true
+    }
+
+    func completeOnboarding(startFirstWorkout: Bool) {
+        onboardingStore.markSeen()
+        showOnboarding = false
+        if startFirstWorkout {
+            selectedTab = 1
+        }
+    }
+
+    func replayOnboarding() {
+        showOnboarding = true
+    }
+
+    private func clearRecoveryState() {
         unfinishedWorkout = nil
         shouldResumeWorkout = false
+        showRecoveryAlert = false
+        workoutStartedExternally = false
     }
 }

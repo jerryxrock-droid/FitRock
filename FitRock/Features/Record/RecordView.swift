@@ -20,6 +20,13 @@ struct RecordView: View {
     @State private var templateDetails: [String: (count: Int, names: [String])] = [:]
     @State private var showTemplateConflictAlert = false
     @State private var pendingTemplateChoice: WorkoutTemplate?
+    @State private var showTrainingManagement = false
+    @State private var weeklyPlan: WeeklyTrainingPlan?
+    @State private var showPlanCountdown = false
+    @State private var pendingPlanStart: (plan: TrainingPlan, day: TrainingPlanDay)?
+
+    private let planRepository = UserDefaultsTrainingPlanRepository.shared
+    private let weeklyPlanResolver = WeeklyPlanResolver()
 
     var body: some View {
         NavigationStack {
@@ -49,11 +56,21 @@ struct RecordView: View {
                     })
                 }
 
+                if showPlanCountdown, let planStart = pendingPlanStart {
+                    CountdownView(onComplete: {
+                        showPlanCountdown = false
+                        pendingPlanStart = nil
+                        viewModel.startWorkoutFromPlan(day: planStart.day, planId: planStart.plan.id)
+                    })
+                }
+
                 // Completion ring overlay
                 if showCompletionRing {
                     CompletionRingView(onComplete: {
                         showCompletionRing = false
                         viewModel.finishWorkout()
+                        appState.markWorkoutCompleted(viewModel.currentWorkout?.id)
+                        loadActivePlan()
                         showSummary = true
                     })
                 }
@@ -89,8 +106,8 @@ struct RecordView: View {
                 Text("确定要取消当前训练吗？所有记录将被删除。")
             }
             .sheet(isPresented: $showExerciseSearch) {
-                ExerciseSearchView(onSelect: { exercise in
-                    viewModel.addExercise(exercise)
+                ExerciseCatalogSearchView(onSelect: { item in
+                    viewModel.addExercise(item)
                 })
             }
             .sheet(isPresented: $showSummary) {
@@ -100,13 +117,24 @@ struct RecordView: View {
                     duration: viewModel.elapsedTime,
                     newPRs: viewModel.pendingNewPRs,
                     onComplete: {
+                        appState.markWorkoutCompleted(viewModel.currentWorkout?.id)
                         viewModel.dismissWorkoutSummary()
+                        loadActivePlan()
                         showSummary = false
                     }
                 )
             }
-            .sheet(isPresented: $showTemplateList) {
-                TemplateListView()
+            .sheet(isPresented: $showTemplateList, onDismiss: {
+                loadQuickTemplates()
+                loadActivePlan()
+            }) {
+                TrainingManagementView()
+            }
+            .sheet(isPresented: $showTrainingManagement, onDismiss: {
+                loadQuickTemplates()
+                loadActivePlan()
+            }) {
+                TrainingManagementView()
             }
             .alert("无法结束训练", isPresented: $showEmptyAlert) {
                 Button("确定") { }
@@ -137,10 +165,7 @@ struct RecordView: View {
                 Text("您有未完成的训练，是否放弃并从模板开始？")
             }
             .onAppear {
-                if appState.shouldResumeWorkout, appState.unfinishedWorkout != nil {
-                    showWorkoutRecovery = true
-                    appState.shouldResumeWorkout = false
-                }
+                handlePendingRecoveryRequest()
                 if appState.workoutStartedExternally, !viewModel.isWorkoutActive {
                     appState.workoutStartedExternally = false
                     do {
@@ -153,6 +178,10 @@ struct RecordView: View {
                     }
                 }
                 loadQuickTemplates()
+                loadActivePlan()
+            }
+            .onChange(of: appState.shouldResumeWorkout) { _ in
+                handlePendingRecoveryRequest()
             }
             .overlay {
                 if showWorkoutRecovery, let workout = appState.unfinishedWorkout {
@@ -170,6 +199,32 @@ struct RecordView: View {
                     .transition(.opacity)
                 }
             }
+        }
+    }
+
+    private func handlePendingRecoveryRequest() {
+        if appState.shouldResumeWorkout, appState.unfinishedWorkout != nil {
+            showWorkoutRecovery = true
+            appState.shouldResumeWorkout = false
+        }
+    }
+
+    @ViewBuilder
+    private var todayPlanSection: some View {
+        if let weeklyPlan {
+            WeeklyPlanCard(
+                weeklyPlan: weeklyPlan,
+                onStart: { startRecommendedPlanSession(weeklyPlan) },
+                onSelectSession: { startPlanSession($0, in: weeklyPlan.plan) },
+                onAdjust: { showTrainingManagement = true },
+                onSkip: { updatePlanSessionStatus($0, status: .skipped) }
+            )
+            .padding(.horizontal, Theme.Spacing.xl)
+        } else {
+            NoPlanCard {
+                showTrainingManagement = true
+            }
+            .padding(.horizontal, Theme.Spacing.xl)
         }
     }
 
@@ -239,10 +294,12 @@ struct RecordView: View {
                             .foregroundColor(Theme.Colors.textMuted)
                     }
 
+                    todayPlanSection
+
                     Button {
                         showCountdown = true
                     } label: {
-                        Text("开始训练")
+                        Text("开始自由训练")
                             .font(Theme.Fonts.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -273,7 +330,7 @@ struct RecordView: View {
 
                             if quickTemplates.count > 3 {
                                 Button {
-                                    showTemplateList = true
+                                    showTrainingManagement = true
                                 } label: {
                                     Text("更多模板 (\(quickTemplates.count) 个)")
                                         .font(Theme.Fonts.body)
@@ -287,11 +344,11 @@ struct RecordView: View {
                     }
 
                     Button {
-                        showTemplateList = true
+                        showTrainingManagement = true
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "slider.horizontal.3")
-                            Text("管理模板")
+                            Text("训练管理")
                         }
                         .font(Theme.Fonts.body)
                         .foregroundColor(Theme.Colors.textSecondary)
@@ -346,6 +403,43 @@ struct RecordView: View {
             templateDetails = details
         } catch {
             print("Error loading quick templates: \(error)")
+        }
+    }
+
+    private func loadActivePlan() {
+        do {
+            try planRepository.markPastDueSessionsSkipped(currentDate: Date())
+            let plan = try planRepository.getActivePlan()
+            weeklyPlan = weeklyPlanResolver.resolve(plan: plan)
+        } catch {
+            print("Error loading active plan: \(error)")
+            weeklyPlan = nil
+        }
+    }
+
+    private func startRecommendedPlanSession(_ weeklyPlan: WeeklyTrainingPlan) {
+        guard let session = weeklyPlan.recommendedSession else { return }
+        startPlanSession(session, in: weeklyPlan.plan)
+    }
+
+    private func startPlanSession(_ session: TrainingPlanDay, in plan: TrainingPlan) {
+        guard session.status != .rest, session.status != .completed else { return }
+        pendingPlanStart = (plan, session)
+        showPlanCountdown = true
+    }
+
+    private func updatePlanSessionStatus(_ session: TrainingPlanDay, status: TrainingPlanDayStatus) {
+        guard let weeklyPlan else { return }
+        do {
+            try planRepository.updateDayStatus(
+                planId: weeklyPlan.plan.id,
+                dayId: session.id,
+                status: status,
+                matchedWorkoutId: session.matchedWorkoutId
+            )
+            loadActivePlan()
+        } catch {
+            print("Error updating plan session status: \(error)")
         }
     }
 
@@ -429,6 +523,261 @@ struct RecordView: View {
                     .foregroundColor(Theme.Colors.accent.opacity(0.5))
             )
         }
+    }
+}
+
+// MARK: - Weekly Plan Cards
+private struct WeeklyPlanCard: View {
+    let weeklyPlan: WeeklyTrainingPlan
+    let onStart: () -> Void
+    let onSelectSession: (TrainingPlanDay) -> Void
+    let onAdjust: () -> Void
+    let onSkip: (TrainingPlanDay) -> Void
+    @State private var isExpanded = false
+
+    private var plan: TrainingPlan { weeklyPlan.plan }
+    private var recommendedSession: TrainingPlanDay? { weeklyPlan.recommendedSession }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("本周计划")
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textMuted)
+                    Text(recommendedSession?.title ?? "本周计划已完成")
+                        .font(Theme.Fonts.headline)
+                        .foregroundColor(Theme.Colors.textPrimary)
+                    Text(summaryText)
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textMuted)
+                }
+                Spacer()
+                progressBadge
+            }
+
+            ProgressView(value: weeklyPlan.completionRate)
+                .tint(Theme.Colors.accent)
+
+            Text("本周推荐按顺序完成，也可任意选择训练。")
+                .font(Theme.Fonts.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+
+            if let recommendedSession {
+                if !recommendedSession.suggestedExerciseNames.isEmpty {
+                    Text(recommendedSession.suggestedExerciseNames.prefix(5).joined(separator: " / "))
+                        .font(Theme.Fonts.body)
+                        .foregroundColor(Theme.Colors.textSecondary)
+                        .lineLimit(2)
+                }
+
+                if let note = recommendedSession.note {
+                    Text(note)
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.textMuted)
+                }
+            } else {
+                Text("本周训练任务已经完成，可以开始自由训练或调整计划。")
+                    .font(Theme.Fonts.body)
+                    .foregroundColor(Theme.Colors.textMuted)
+            }
+
+            if isExpanded {
+                VStack(spacing: 8) {
+                    ForEach(weeklyPlan.sessions) { session in
+                        WeeklyPlanSessionRow(
+                            session: session,
+                            onStart: { onSelectSession(session) },
+                            onSkip: { onSkip(session) }
+                        )
+                    }
+                }
+            }
+
+            HStack(spacing: Theme.Spacing.sm) {
+                Button(action: onStart) {
+                    Label(primaryActionTitle, systemImage: recommendedSession == nil ? "checkmark.circle.fill" : "play.fill")
+                        .font(Theme.Fonts.body)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(primaryActionColor)
+                        .cornerRadius(Theme.CornerRadius.small)
+                }
+                .disabled(recommendedSession == nil)
+
+                Menu {
+                    Button(isExpanded ? "收起本周任务" : "查看本周任务") {
+                        isExpanded.toggle()
+                    }
+                    Button("调整计划", action: onAdjust)
+                    if let recommendedSession, recommendedSession.status == .planned || recommendedSession.status == .moved {
+                        Button("跳过推荐训练", role: .destructive) {
+                            onSkip(recommendedSession)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.headline)
+                        .foregroundColor(Theme.Colors.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .background(Theme.Colors.surface2)
+                        .cornerRadius(Theme.CornerRadius.small)
+                }
+            }
+        }
+        .padding()
+        .background(Theme.Colors.surface)
+        .cornerRadius(Theme.CornerRadius.medium)
+        .accessibilityIdentifier("weekly-plan-card")
+    }
+
+    private var summaryText: String {
+        var parts: [String] = []
+        parts.append("第 \(weeklyPlan.week.weekIndex) 周")
+        parts.append("\(weeklyPlan.completedCount)/\(weeklyPlan.totalCount) 已完成")
+        if let recommendedSession, !recommendedSession.targetBodyParts.isEmpty {
+            parts.append(recommendedSession.targetBodyParts.map(\.displayName).joined(separator: " / "))
+        }
+        if let minutes = plan.recommendedSessionMinutes {
+            parts.append("预计 \(minutes) 分钟")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    private var primaryActionTitle: String {
+        recommendedSession == nil ? "本周已完成" : "开始推荐训练"
+    }
+
+    private var primaryActionColor: Color {
+        recommendedSession == nil ? Theme.Colors.success.opacity(0.7) : Theme.Colors.accent
+    }
+
+    private var progressBadge: some View {
+        Text("\(Int(weeklyPlan.completionRate * 100))%")
+            .font(Theme.Fonts.caption)
+            .foregroundColor(Theme.Colors.accent)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Theme.Colors.accent.opacity(0.12))
+            .cornerRadius(6)
+    }
+}
+
+private struct WeeklyPlanSessionRow: View {
+    let session: TrainingPlanDay
+    let onStart: () -> Void
+    let onSkip: () -> Void
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text("第 \(session.sequenceIndex ?? 1) 练 · \(session.title)")
+                        .font(Theme.Fonts.body)
+                        .foregroundColor(session.status == .completed ? Theme.Colors.textMuted : Theme.Colors.textPrimary)
+                    strategyBadge
+                }
+                Text(session.targetBodyParts.map(\.displayName).joined(separator: " / "))
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(Theme.Colors.textMuted)
+                    .lineLimit(1)
+                if let completedAt = session.completedAt {
+                    Text("完成于 \(shortTime(completedAt))")
+                        .font(Theme.Fonts.caption)
+                        .foregroundColor(Theme.Colors.success)
+                }
+            }
+            Spacer()
+            Menu {
+                if session.status == .planned || session.status == .moved {
+                    Button("开始此训练", action: onStart)
+                    Button("标记跳过", role: .destructive, action: onSkip)
+                }
+            } label: {
+                Text(session.status.displayName)
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(statusColor)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(statusColor.opacity(0.12))
+                    .cornerRadius(6)
+            }
+            .disabled(session.status == .completed || session.status == .skipped)
+        }
+        .padding(10)
+        .background(Theme.Colors.surface2)
+        .cornerRadius(Theme.CornerRadius.small)
+    }
+
+    private var strategyBadge: some View {
+        Text(strategyLabel)
+            .font(Theme.Fonts.caption)
+            .foregroundColor(Theme.Colors.accent)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Theme.Colors.accent.opacity(0.12))
+            .cornerRadius(5)
+    }
+
+    private var strategyLabel: String {
+        guard let note = session.note else { return "计划" }
+        if note.contains("适应") { return "适应" }
+        if note.contains("容量") { return "容量" }
+        if note.contains("强度") { return "强度" }
+        if note.contains("Deload") || note.contains("deload") { return "Deload" }
+        return "计划"
+    }
+
+    private var statusColor: Color {
+        switch session.status {
+        case .completed: return Theme.Colors.success
+        case .skipped: return Theme.Colors.error
+        case .moved: return Theme.Colors.warning
+        case .rest: return Theme.Colors.textMuted
+        case .planned: return Theme.Colors.accent
+        }
+    }
+
+    private func shortTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M月d日 HH:mm"
+        return formatter.string(from: date)
+    }
+}
+
+private struct NoPlanCard: View {
+    let onGenerate: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "calendar.badge.plus")
+                    .foregroundColor(Theme.Colors.accent)
+                Text("还没有训练计划")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textPrimary)
+            }
+
+            Text("根据目标、每周天数和单次时长生成 4 周安排，之后每天都能从这里直接开始。")
+                .font(Theme.Fonts.body)
+                .foregroundColor(Theme.Colors.textMuted)
+                .lineSpacing(3)
+
+            Button(action: onGenerate) {
+                Label("生成4周计划", systemImage: "sparkles")
+                    .font(Theme.Fonts.body)
+                    .foregroundColor(Theme.Colors.accent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Theme.Colors.accent.opacity(0.12))
+                    .cornerRadius(Theme.CornerRadius.small)
+            }
+        }
+        .padding()
+        .background(Theme.Colors.surface)
+        .cornerRadius(Theme.CornerRadius.medium)
+        .accessibilityIdentifier("no-plan-card")
     }
 }
 

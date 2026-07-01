@@ -24,12 +24,49 @@ targets:
     type: application
     platform: iOS
     sources:
-      - FitRock
+      - path: FitRock
+        excludes:
+          - free-exercise-db-main/**
+          - Resources/Data/**
+          - Resources/ExerciseImages/**
+      - path: FitRock/Resources/Data
+        type: folder
+      - path: FitRock/Resources/ExerciseImages
+        type: folder
     dependencies:
       - package: SQLite
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fitrock.FitRock
         INFOPLIST_KEY_CFBundleDisplayName: FitRock
+        INFOPLIST_KEY_NSHealthShareUsageDescription: FitRock 可读取体重、心率和活动能量，用于生成更贴近状态的训练计划建议。
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    entitlements:
+      path: FitRock/FitRock.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+
+  FitRockTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - FitRockTests
+    dependencies:
+      - target: FitRock
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fitrock.FitRockTests
+        GENERATE_INFOPLIST_FILE: YES
+
+  FitRockUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - FitRockUITests
+    dependencies:
+      - target: FitRock
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fitrock.FitRockUITests
+        GENERATE_INFOPLIST_FILE: YES

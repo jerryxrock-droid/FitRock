@@ -1,6 +1,19 @@
 import Foundation
 
-final class LocalExerciseDataService {
+protocol LocalExerciseDataProviding {
+    var equipments: [Equipment] { get }
+    var exercises: [ExerciseInfo] { get }
+    var musclesZh: [String: String] { get }
+
+    func loadIfNeeded()
+    func equipment(by id: String) -> Equipment?
+    func exercise(by id: String) -> ExerciseInfo?
+    func exercises(for equipmentId: String) -> [ExerciseInfo]
+    func equipmentExerciseCount(_ equipmentId: String) -> Int
+    func chineseName(for englishMuscle: String) -> String
+}
+
+final class LocalExerciseDataService: LocalExerciseDataProviding {
     static let shared = LocalExerciseDataService()
 
     private(set) var equipments: [Equipment] = []

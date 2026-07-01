@@ -74,6 +74,10 @@ struct ExerciseDetailView: View {
                     } else if let ex = exercise {
                         // Existing DB exercise mode
                         headerSection(ex)
+                        NavigationLink(destination: ExerciseHistoryView(exercise: ex)) {
+                            historyLinkLabel
+                        }
+                        .buttonStyle(.plain)
                         if let content = teachingContent {
                             teachingSection(content)
                         } else {
@@ -84,6 +88,11 @@ struct ExerciseDetailView: View {
                     if exercise != nil {
                         addToWorkoutButton
                             .padding(.top, Theme.Spacing.sm)
+                    } else if let info = exerciseInfo {
+                        NavigationLink(destination: ExerciseHistoryView(exerciseInfo: info)) {
+                            historyLinkLabel
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding()
@@ -437,6 +446,28 @@ struct ExerciseDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
+        .background(Theme.Colors.surface)
+        .cornerRadius(Theme.CornerRadius.medium)
+    }
+
+    private var historyLinkLabel: some View {
+        HStack {
+            Image(systemName: "clock.arrow.circlepath")
+                .foregroundColor(Theme.Colors.accent)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("动作历史")
+                    .font(Theme.Fonts.headline)
+                    .foregroundColor(Theme.Colors.textPrimary)
+                Text("查看训练记录、PR 和相关肌肉")
+                    .font(Theme.Fonts.caption)
+                    .foregroundColor(Theme.Colors.textMuted)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(Theme.Colors.textMuted)
+        }
+        .padding()
         .background(Theme.Colors.surface)
         .cornerRadius(Theme.CornerRadius.medium)
     }

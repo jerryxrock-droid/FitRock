@@ -5,10 +5,11 @@ import SwiftUI
 /// On iOS 16, falls back to simple body part buttons.
 struct MuscleMapSectionView: View {
     @Binding var selectedBodyPart: BodyPart?
+    @Binding var selectedMuscle: Muscle?
 
     var body: some View {
         if #available(iOS 17.0, *) {
-            MuscleMapInteractiveView(selectedBodyPart: $selectedBodyPart)
+            MuscleMapInteractiveView(selectedBodyPart: $selectedBodyPart, selectedMuscle: $selectedMuscle)
         } else {
             MuscleMapFallbackView(selectedBodyPart: $selectedBodyPart)
         }
@@ -18,13 +19,20 @@ struct MuscleMapSectionView: View {
 @available(iOS 17.0, *)
 private struct MuscleMapInteractiveView: View {
     @Binding var selectedBodyPart: BodyPart?
+    @Binding var selectedMuscle: Muscle?
     @State private var showBack = false
 
     private var displayedName: String {
-        MuscleGroupMapper.displayName(for: selectedBodyPart)
+        if let selectedMuscle {
+            return selectedMuscle.displayName
+        }
+        return MuscleGroupMapper.displayName(for: selectedBodyPart)
     }
 
     private var highlightColor: Color {
+        if let selectedMuscle, let bp = MuscleGroupMapper.bodyPart(for: selectedMuscle) {
+            return bp.themeColor
+        }
         guard let bp = selectedBodyPart else { return .clear }
         return bp.themeColor
     }
@@ -56,15 +64,22 @@ private struct MuscleMapInteractiveView: View {
             let bodyView = BodyView(gender: .male, side: showBack ? .back : .front)
                 .onMuscleSelected { muscle, _ in
                     if let bp = MuscleGroupMapper.bodyPart(for: muscle) {
-                        if selectedBodyPart == bp {
+                        if selectedMuscle == muscle {
+                            selectedMuscle = nil
                             selectedBodyPart = nil
                         } else {
+                            selectedMuscle = muscle
                             selectedBodyPart = bp
                         }
                     }
                 }
 
-            if let bp = selectedBodyPart {
+            if let selectedMuscle {
+                bodyView
+                    .highlight([selectedMuscle], color: highlightColor, opacity: 0.9)
+                    .frame(height: 320)
+                    .padding(.horizontal, 8)
+            } else if let bp = selectedBodyPart {
                 bodyView
                     .highlight(MuscleGroupMapper.muscles(for: bp), color: bp.themeColor, opacity: 0.85)
                     .frame(height: 320)
@@ -80,14 +95,15 @@ private struct MuscleMapInteractiveView: View {
                 // Selected body part name
                 Text(displayedName)
                     .font(Theme.Fonts.headline)
-                    .foregroundColor(selectedBodyPart != nil ? highlightColor : Theme.Colors.textMuted)
+                    .foregroundColor(selectedBodyPart != nil || selectedMuscle != nil ? highlightColor : Theme.Colors.textMuted)
 
                 Spacer()
 
                 // Clear button (only visible when something is selected)
-                if selectedBodyPart != nil {
+                if selectedBodyPart != nil || selectedMuscle != nil {
                     Button {
                         selectedBodyPart = nil
+                        selectedMuscle = nil
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "xmark.circle.fill")

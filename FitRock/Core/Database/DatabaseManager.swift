@@ -1,10 +1,11 @@
 import Foundation
 import SQLite
 
-final class DatabaseManager {
+final class DatabaseManager: FitRockRepository {
     static let shared = DatabaseManager()
 
     private var db: Connection?
+    private let databaseURL: URL?
 
     // PR columns
     private let colPrId = SQLite.Expression<Int64>("id")
@@ -56,6 +57,8 @@ final class DatabaseManager {
     private let colStartTime = SQLite.Expression<Date>("start_time")
     private let colEndTime = SQLite.Expression<Date?>("end_time")
     private let colIsCompleted = SQLite.Expression<Bool>("is_completed")
+    private let colTrainingPlanId = SQLite.Expression<String?>("training_plan_id")
+    private let colPlannedDayId = SQLite.Expression<String?>("planned_day_id")
 
     // WorkoutExercise columns
     private let colWorkoutExerciseId = SQLite.Expression<String>("id")
@@ -106,13 +109,28 @@ final class DatabaseManager {
     private let colTemplateSetType = SQLite.Expression<String>("set_type")
     private let colTemplateSetRestSeconds = SQLite.Expression<Int?>("rest_seconds")
 
-    private init() {}
+    init(databaseURL: URL? = nil) {
+        self.databaseURL = databaseURL
+    }
 
     func connect() throws {
         guard db == nil else { return }
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let dbPath = documentsPath.appendingPathComponent("fitrock.sqlite3").path
-        db = try Connection(dbPath)
+        let dbURL: URL
+        if let databaseURL {
+            dbURL = databaseURL
+        } else {
+            let arguments = ProcessInfo.processInfo.arguments
+            if arguments.contains("--ui-testing") {
+                dbURL = FileManager.default.temporaryDirectory.appendingPathComponent("fitrock-ui-testing.sqlite3")
+                if arguments.contains("--reset-ui-data") {
+                    try? FileManager.default.removeItem(at: dbURL)
+                }
+            } else {
+                let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                dbURL = documentsPath.appendingPathComponent("fitrock.sqlite3")
+            }
+        }
+        db = try Connection(dbURL.path)
         try createTables()
         try seedExercises()
         try migrateSchemaIfNeeded()
@@ -121,10 +139,10 @@ final class DatabaseManager {
     private func migrateSchemaIfNeeded() throws {
         guard let db = db else { return }
 
-        let tableInfo = try db.prepare("PRAGMA table_info(exercises)")
+        let exerciseTableInfo = try db.prepare("PRAGMA table_info(exercises)")
         var hasIsUserCreated = false
         var hasUnit = false
-        for row in tableInfo {
+        for row in exerciseTableInfo {
             if row[1] as? String == "is_user_created" {
                 hasIsUserCreated = true
             }
@@ -142,6 +160,24 @@ final class DatabaseManager {
         // Migrate existing exercises with NULL unit to default weight
         try db.run("UPDATE exercises SET unit = 'weight' WHERE unit IS NULL")
 
+        let workoutTableInfo = try db.prepare("PRAGMA table_info(workouts)")
+        var hasTrainingPlanId = false
+        var hasPlannedDayId = false
+        for row in workoutTableInfo {
+            if row[1] as? String == "training_plan_id" {
+                hasTrainingPlanId = true
+            }
+            if row[1] as? String == "planned_day_id" {
+                hasPlannedDayId = true
+            }
+        }
+        if !hasTrainingPlanId {
+            try db.run("ALTER TABLE workouts ADD COLUMN training_plan_id TEXT")
+        }
+        if !hasPlannedDayId {
+            try db.run("ALTER TABLE workouts ADD COLUMN planned_day_id TEXT")
+        }
+
         // Clean up old estimated_1rm PR records (removed PR type)
         try db.run("DELETE FROM exercise_prs WHERE pr_type = 'estimated_1rm'")
         try db.run("DELETE FROM pr_events WHERE pr_type = 'estimated_1rm'")
@@ -155,6 +191,8 @@ final class DatabaseManager {
             t.column(colStartTime)
             t.column(colEndTime)
             t.column(colIsCompleted)
+            t.column(colTrainingPlanId)
+            t.column(colPlannedDayId)
         })
 
         try db.run(workoutExercises.create(ifNotExists: true) { t in
@@ -260,7 +298,9 @@ final class DatabaseManager {
                 colId <- workout.id,
                 colStartTime <- workout.startTime,
                 colEndTime <- workout.endTime,
-                colIsCompleted <- workout.isCompleted
+                colIsCompleted <- workout.isCompleted,
+                colTrainingPlanId <- workout.trainingPlanId,
+                colPlannedDayId <- workout.plannedDayId
             )
             try db.run(insert)
 
@@ -427,7 +467,9 @@ final class DatabaseManager {
             startTime: workoutRow?[colStartTime] ?? Date(),
             endTime: workoutRow?[colEndTime],
             exercises: exercisesList,
-            isCompleted: workoutRow?[colIsCompleted] ?? false
+            isCompleted: workoutRow?[colIsCompleted] ?? false,
+            trainingPlanId: workoutRow?[colTrainingPlanId],
+            plannedDayId: workoutRow?[colPlannedDayId]
         )
     }
 

@@ -8,10 +8,40 @@ final class RecordViewModel: ObservableObject {
     @Published var elapsedTime: TimeInterval = 0
     @Published var pendingNewPRs: [PersonalRecordEvent] = []
 
-    private let db = DatabaseManager.shared
-    private var timer: Timer?
+    private let workoutRepository: WorkoutRepository
+    private let exerciseRepository: ExerciseRepository
+    private let templateRepository: TemplateRepository
+    private let prService: PRService
+    private let workoutTimer: WorkoutTiming
+    private let trainingPlanRepository: TrainingPlanRepository
+    private let trainingPlanCompletionMatcher: TrainingPlanCompletionMatcher
+    private let exerciseCatalogService: ExerciseCatalogProviding
+    private let exerciseSearchScorer = ExerciseSearchScorer()
     private var expandedIds: Set<String> = []
     private var workoutStartTime: Date?
+
+    init(
+        workoutRepository: WorkoutRepository = DatabaseManager.shared,
+        exerciseRepository: ExerciseRepository = DatabaseManager.shared,
+        templateRepository: TemplateRepository = DatabaseManager.shared,
+        prService: PRService = .shared,
+        workoutTimer: WorkoutTiming = WorkoutTimer(),
+        trainingPlanRepository: TrainingPlanRepository = UserDefaultsTrainingPlanRepository.shared,
+        trainingPlanCompletionMatcher: TrainingPlanCompletionMatcher = TrainingPlanCompletionMatcher(),
+        exerciseCatalogService: ExerciseCatalogProviding = ExerciseCatalogService()
+    ) {
+        self.workoutRepository = workoutRepository
+        self.exerciseRepository = exerciseRepository
+        self.templateRepository = templateRepository
+        self.prService = prService
+        self.workoutTimer = workoutTimer
+        self.trainingPlanRepository = trainingPlanRepository
+        self.trainingPlanCompletionMatcher = trainingPlanCompletionMatcher
+        self.exerciseCatalogService = exerciseCatalogService
+        self.workoutTimer.onTick = { [weak self] elapsedTime in
+            self?.elapsedTime = elapsedTime
+        }
+    }
 
     var totalSets: Int {
         workoutExercises.flatMap { $0.sets }.filter { $0.setType != .warmup }.count
@@ -34,8 +64,8 @@ final class RecordViewModel: ObservableObject {
         startTimer()
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error starting workout: \(error)")
         }
@@ -51,10 +81,10 @@ final class RecordViewModel: ObservableObject {
         expandedIds = []
 
         do {
-            try db.connect()
+            try workoutRepository.connect()
             workoutExercises = try workout.exercises.map { we in
-                let lastSets = try db.getLastWorkoutSets(for: we.exerciseId)
-                let exercise = try db.getExercise(by: we.exerciseId)
+                let lastSets = try workoutRepository.getLastWorkoutSets(for: we.exerciseId)
+                let exercise = try exerciseRepository.getExercise(by: we.exerciseId)
                 return WorkoutExerciseDisplay(
                     from: we,
                     lastSets: lastSets.map { ExerciseSetDisplay(from: $0) },
@@ -84,9 +114,10 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
-            pendingNewPRs = try PRService.shared.evaluateAndSave(workout: workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
+            pendingNewPRs = try prService.evaluateAndSave(workout: workout)
+            try autoMatchTrainingPlan(for: workout)
         } catch {
             print("Error finishing workout: \(error)")
             pendingNewPRs = []
@@ -108,7 +139,7 @@ final class RecordViewModel: ObservableObject {
         stopTimer()
 
         if let workout = currentWorkout {
-            try? db.deleteWorkout(workout.id)
+            try? workoutRepository.deleteWorkout(workout.id)
         }
 
         currentWorkout = nil
@@ -121,20 +152,44 @@ final class RecordViewModel: ObservableObject {
     }
 
     func addExercise(_ exercise: Exercise) {
+        let item = ExerciseCatalogItem(
+            catalogId: exercise.isUserCreated ? "user:\(exercise.id)" : "db:\(exercise.id)",
+            source: exercise.isUserCreated ? .user : .db,
+            dbExerciseId: exercise.id,
+            jsonExerciseId: nil,
+            nameZh: exercise.name,
+            nameEn: nil,
+            bodyPart: exercise.bodyPart,
+            unit: exercise.unit,
+            equipmentId: nil,
+            equipmentNameZh: nil,
+            equipmentNameEn: nil,
+            primaryMuscles: ExerciseMuscleMappingProvider.mapping(for: exercise.bodyPart).primaryMuscles,
+            secondaryMuscles: ExerciseMuscleMappingProvider.mapping(for: exercise.bodyPart).secondaryMuscles,
+            isUserCreated: exercise.isUserCreated,
+            images: []
+        )
+        addExercise(item)
+    }
+
+    func addExercise(_ item: ExerciseCatalogItem) {
         guard var workout = currentWorkout else { return }
+        guard let bodyPart = item.bodyPart else { return }
+        let recordExerciseId = item.recordExerciseId
+        guard !workout.exercises.contains(where: { $0.exerciseId == recordExerciseId }) else { return }
 
         let workoutExercise = WorkoutExercise(
-            exerciseId: exercise.id,
-            exerciseName: exercise.name,
-            bodyPart: exercise.bodyPart
+            exerciseId: recordExerciseId,
+            exerciseName: item.nameZh,
+            bodyPart: bodyPart
         )
 
         workout.exercises.append(workoutExercise)
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error adding exercise: \(error)")
         }
@@ -150,8 +205,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error deleting exercise: \(error)")
         }
@@ -167,8 +222,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error updating exercise name: \(error)")
         }
@@ -178,8 +233,8 @@ final class RecordViewModel: ObservableObject {
 
     func saveAsUserExercise(name: String, bodyPart: BodyPart) {
         do {
-            try db.connect()
-            try db.saveUserExercise(name: name, bodyPart: bodyPart)
+            try exerciseRepository.connect()
+            try exerciseRepository.saveUserExercise(name: name, bodyPart: bodyPart)
             Haptic.success.trigger()
         } catch {
             print("Error saving user exercise: \(error)")
@@ -206,8 +261,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error adding set: \(error)")
         }
@@ -230,8 +285,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error deleting set: \(error)")
         }
@@ -250,8 +305,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error updating set: \(error)")
         }
@@ -267,8 +322,8 @@ final class RecordViewModel: ObservableObject {
         currentWorkout = workout
 
         do {
-            try db.connect()
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
         } catch {
             print("Error toggling warm up: \(error)")
         }
@@ -291,8 +346,8 @@ final class RecordViewModel: ObservableObject {
 
     func startWorkoutFromTemplate(_ templateId: String) {
         do {
-            try db.connect()
-            guard let result = try db.createWorkoutFromTemplate(templateId) else { return }
+            try templateRepository.connect()
+            guard let result = try templateRepository.createWorkoutFromTemplate(templateId) else { return }
             let (workout, exercisesDisplay) = result
 
             workoutStartTime = workout.startTime
@@ -302,12 +357,35 @@ final class RecordViewModel: ObservableObject {
             elapsedTime = 0
             expandedIds = Set(exercisesDisplay.map { $0.id })
 
-            try db.saveWorkout(workout)
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
             startTimer()
             Haptic.success.trigger()
         } catch {
             print("Error starting workout from template: \(error)")
         }
+    }
+
+    func startWorkoutFromPlan(day: TrainingPlanDay, planId: String) {
+        var workout = Workout(trainingPlanId: planId, plannedDayId: day.id)
+        workoutStartTime = workout.startTime
+        workout.exercises = plannedExercises(for: day)
+        currentWorkout = workout
+        isWorkoutActive = true
+        elapsedTime = 0
+        expandedIds = []
+
+        do {
+            try workoutRepository.connect()
+            try workoutRepository.saveWorkout(workout)
+        } catch {
+            print("Error starting workout from plan: \(error)")
+        }
+
+        loadWorkoutExercises()
+        expandedIds = Set(workoutExercises.map { $0.id })
+        startTimer()
+        Haptic.success.trigger()
     }
 
     private func loadWorkoutExercises() {
@@ -317,10 +395,10 @@ final class RecordViewModel: ObservableObject {
         }
 
         do {
-            try db.connect()
+            try workoutRepository.connect()
             workoutExercises = try workout.exercises.map { we in
-                let lastSets = try db.getLastWorkoutSets(for: we.exerciseId)
-                let exercise = try db.getExercise(by: we.exerciseId)
+                let lastSets = try workoutRepository.getLastWorkoutSets(for: we.exerciseId)
+                let exercise = try exerciseRepository.getExercise(by: we.exerciseId)
                 return WorkoutExerciseDisplay(
                     from: we,
                     lastSets: lastSets.map { ExerciseSetDisplay(from: $0) },
@@ -334,16 +412,57 @@ final class RecordViewModel: ObservableObject {
     }
 
     private func startTimer() {
-        stopTimer()
-        // Use Date-based timing for accuracy even when app is backgrounded
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            guard let self = self, let startTime = self.workoutStartTime else { return }
-            self.elapsedTime = Date().timeIntervalSince(startTime)
+        guard let workoutStartTime else {
+            return
         }
+        workoutTimer.start(from: workoutStartTime)
     }
 
     private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        workoutTimer.stop()
+    }
+
+    private func autoMatchTrainingPlan(for workout: Workout) throws {
+        guard let plan = try trainingPlanRepository.getActivePlan(),
+              let match = trainingPlanCompletionMatcher.matchCompletedWorkout(workout, in: plan) else {
+            return
+        }
+        try trainingPlanRepository.updateDayStatus(
+            planId: plan.id,
+            dayId: match.dayId,
+            status: match.status,
+            matchedWorkoutId: workout.id
+        )
+    }
+
+    private func plannedExercises(for day: TrainingPlanDay) -> [WorkoutExercise] {
+        let fallbackBodyPart = day.targetBodyParts.first ?? .chest
+        let catalogItems = (try? exerciseCatalogService.loadCatalogItems()) ?? []
+        var usedExerciseIds: Set<String> = []
+
+        return day.suggestedExerciseNames.compactMap { name in
+            let matchedItem = bestCatalogItem(for: name, in: catalogItems)
+            let exerciseId = matchedItem?.recordExerciseId ?? "plan:\(exerciseSearchScorer.normalize(name))"
+            guard !usedExerciseIds.contains(exerciseId) else { return nil }
+            usedExerciseIds.insert(exerciseId)
+
+            return WorkoutExercise(
+                exerciseId: exerciseId,
+                exerciseName: matchedItem?.nameZh ?? name,
+                bodyPart: matchedItem?.bodyPart ?? fallbackBodyPart
+            )
+        }
+    }
+
+    private func bestCatalogItem(for exerciseName: String, in items: [ExerciseCatalogItem]) -> ExerciseCatalogItem? {
+        let query = exerciseSearchScorer.normalize(exerciseName)
+        guard !query.isEmpty else { return nil }
+        if let exact = items.first(where: {
+            exerciseSearchScorer.normalize($0.nameZh) == query ||
+            exerciseSearchScorer.normalize($0.nameEn ?? "") == query
+        }) {
+            return exact
+        }
+        return exerciseSearchScorer.sortedCatalogItems(items, query: exerciseName).first
     }
 }

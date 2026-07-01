@@ -16,6 +16,10 @@
 - 📊 **月统计卡片** — 月训练次数 / 连续打卡天数 / 月均吨位 (T) 三项一屏看全
 - 🏋️ **支持多单位** — weight(kg) / reps(次) / duration(分钟) 三种动作单位自由切换
 - ➕ **用户自建动作** — 内置动作库不够用？自己加
+- 🧱 **模板 + PR** — 支持训练模板、从模板开练、个人记录评估与历史事件
+- 🏋️‍♂️ **双模式动作库** — 按肌肉图谱浏览 DB 动作，或按器械浏览本地 JSON 教学内容
+- 🔥 **肌肉热力图** — 将训练量映射到具体肌肉，查看近期偏重和遗漏肌群
+- 🗓️ **4 周训练计划** — 基于历史训练、可选健康数据和用户目标生成月周期计划
 - 🗃️ **纯本地 SQLite** — 用 [stephencelis/SQLite.swift](https://github.com/stephencelis/SQLite.swift) 直接读写，零网络依赖
 - 🌓 **强制深色模式** — 为健身房低光环境设计，亮色模式根本不给你选项
 
@@ -27,8 +31,9 @@
 |---|---|---|
 | **UI** | SwiftUI + Combine | iOS 16+ 原生，状态驱动，开发效率高 |
 | **持久化** | SQLite.swift ≥ 0.15.0 | 比 Core Data 透明，比 SwiftData 稳定（生产可用） |
-| **架构** | MVVM (View + ViewModel + ObservableObject) | 4 个 feature 模块独立可测试 |
+| **架构** | SwiftUI MVVM + Repository Protocols | ViewModel 通过协议依赖数据层，便于单测 |
 | **项目生成** | XcodeGen | `project.yml` 描述，`xcodegen generate` 即可 |
+| **测试** | XCTest + XCUITest | 本地单测与 UI 自动化测试 |
 | **最低 iOS** | 16.0 | 覆盖 ~95% 在用 iPhone 设备 |
 | **Swift** | 5.9 | 严格并发还未启用，但 `async/await` 可用 |
 
@@ -41,15 +46,20 @@ FitRock/
 ├── App/                  # 入口 (FitRockApp.swift + ContentView.swift)
 │   └── AppState          # 全局未完成训练恢复逻辑
 ├── Core/
-│   ├── Database/         # DatabaseManager — SQLite 单例 + 4 张表 + 自动 migration
-│   └── Models/           # Workout / WorkoutExercise / Exercise / ExerciseSet / Enums
-├── Features/             # 4 大模块（每模块 = View + ViewModel）
+│   ├── Database/         # DatabaseManager facade + Repository protocols + SQLite migration
+│   ├── Models/           # Workout / Exercise / Template / PR / JSON models
+│   └── Services/         # PRService / LocalExerciseDataService / resource validation
+├── Features/             # 主要功能模块（每模块 = View + ViewModel）
 │   ├── Home/             # 月历 + 统计卡片
 │   ├── Record/           # 训练中：计时 / 增删动作 / 完成 / 取消
-│   ├── Stats/            # 训练历史 + 容量趋势
+│   ├── ExerciseLibrary/  # 双模式动作库：肌肉 / 器械
+│   ├── Templates/        # 训练模板
+│   ├── Stats/            # 训练历史 + 容量趋势 + PR
 │   └── Settings/         # 设置（目前是版本号占位）
 ├── Shared/               # Theme + HapticManager
-├── Resources/            # Assets.xcassets
+├── Resources/            # Assets + Data JSON + ExerciseImages folder reference
+├── FitRockTests/         # 业务单测、仓储测试、资源一致性测试
+├── FitRockUITests/       # 关键 UI 流程自动化
 └── AppIcon/              # 设计资源
 ```
 
@@ -96,19 +106,24 @@ open FitRock.xcodeproj
 
 **首次运行**会做：
 1. 在 app sandbox 的 `Documents/fitrock.sqlite3` 创建数据库
-2. 创建 4 张表（workouts / workout_exercises / exercise_sets / exercises）
+2. 创建 SQLite 表并执行幂等迁移
 3. Seed 内置动作库
-4. 跑 schema migration（添加 `is_user_created` + `unit` 字段）
+4. 加载本地 JSON 器械库与动作图片资源
 
 ---
 
-## 🗃️ 数据模型（4 张表）
+## 🗃️ 数据模型
 
 ```sql
 workouts           (id, start_time, end_time, is_completed)
 workout_exercises  (id, workout_id, exercise_id, exercise_name, body_part)
 exercise_sets      (id, workout_exercise_id, set_number, weight, reps, set_type, is_completed)
 exercises          (id, exercise_name, body_part, description, is_user_created, unit)
+workout_templates
+workout_template_exercises
+workout_template_sets
+exercise_prs
+pr_events
 ```
 
 **7 个身体部位**：chest / back / shoulders / arms / legs / core / cardio
@@ -118,6 +133,49 @@ exercises          (id, exercise_name, body_part, description, is_user_created, 
 **3 种动作单位**：weight(kg) / reps(次) / duration(分钟)
 
 迁移策略：`migrateSchemaIfNeeded()` 检查缺列，缺就 `ALTER TABLE`，幂等可重入。
+
+---
+
+## 🧪 本地测试
+
+```bash
+# 重新生成工程
+xcodegen generate
+
+# 编译 App 与测试 target（不需要签名）
+xcodebuild build-for-testing \
+  -project FitRock.xcodeproj \
+  -scheme FitRock \
+  -destination 'generic/platform=iOS' \
+  CODE_SIGNING_ALLOWED=NO
+
+# 单元测试（需要可用 iOS Simulator）
+xcodebuild test \
+  -project FitRock.xcodeproj \
+  -scheme FitRock \
+  -destination 'platform=iOS Simulator,name=iPhone 15' \
+  -only-testing:FitRockTests
+
+# UI 测试（需要可用 iOS Simulator）
+xcodebuild test \
+  -project FitRock.xcodeproj \
+  -scheme FitRock \
+  -destination 'platform=iOS Simulator,name=iPhone 15' \
+  -only-testing:FitRockUITests
+```
+
+测试覆盖：
+- `StatsCalculatorTests`：统计周期、总量、身体部位分布、动作排行
+- `PRServiceTests`：最大重量、容量、时长 PR、PR rebuild
+- `RepositoryTests`：临时 SQLite 训练/动作/模板读写、迁移幂等
+- `LocalExerciseDataServiceTests`：20 个器械、26 个动作、肌群映射、图片引用完整性
+- `ViewModelTests`：动作库过滤、统计错误回落
+- `FitRockUITests`：启动、Tab 导航、训练/动作库/统计冒烟流程
+- `MuscleHeatmapCalculatorTests`：具体肌肉热力图、时间范围、JSON/DB 映射
+- `TrainingPlanRecommendationEngineTests`：4 周计划推荐、目标差异、HealthKit 可选输入
+- `TrainingPlanCompletionTests`：训练完成后自动匹配计划日、完成率
+
+当前资源：`exercises.json` 有 52 个图片引用，其中 48 个唯一 JPG 文件，均已存在于 `Resources/ExerciseImages/`。
 
 ---
 
@@ -134,8 +192,8 @@ exercises          (id, exercise_name, body_part, description, is_user_created, 
 ## 🗺️ Roadmap
 
 - [ ] HealthKit 双向同步（Apple 健康里也能看到）
-- [ ] 训练计划模板（Push/Pull/Legs）
-- [ ] 训练容量趋势图（折线图）
+- [x] 训练计划模板（Push/Pull/Legs）
+- [ ] 训练容量趋势图增强（折线图、周期对比）
 - [ ] Apple Watch 配套 App
 - [ ] iCloud 同步（可选、可关闭、端到端加密）
 - [ ] 导出训练数据为 CSV

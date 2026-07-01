@@ -45,8 +45,8 @@ struct TemplateEditorView: View {
                 }
             }
             .sheet(isPresented: $showExerciseSearch) {
-                ExerciseSearchView(onSelect: { exercise in
-                    addExercise(exercise)
+                ExerciseCatalogSearchView(onSelect: { item in
+                    addExercise(item)
                 })
             }
             .alert("保存成功", isPresented: $showSaveSuccess) {
@@ -178,6 +178,8 @@ struct TemplateEditorView: View {
                         bodyPart: te.bodyPart,
                         sortOrder: te.sortOrder,
                         unit: te.unit,
+                        source: te.exerciseId.hasPrefix("json:") ? .json : .db,
+                        equipmentName: nil,
                         sets: sets
                     )
                 }
@@ -188,17 +190,21 @@ struct TemplateEditorView: View {
         }
     }
 
-    private func addExercise(_ exercise: Exercise) {
-        let existing = exercises.first { $0.exerciseId == exercise.id }
+    private func addExercise(_ item: ExerciseCatalogItem) {
+        guard let bodyPart = item.bodyPart else { return }
+        let recordExerciseId = item.recordExerciseId
+        let existing = exercises.first { $0.exerciseId == recordExerciseId }
         guard existing == nil else { return }
 
         exercises.append(TemplateExerciseItem(
             id: UUID().uuidString,
-            exerciseId: exercise.id,
-            exerciseName: exercise.name,
-            bodyPart: exercise.bodyPart,
+            exerciseId: recordExerciseId,
+            exerciseName: item.nameZh,
+            bodyPart: bodyPart,
             sortOrder: exercises.count,
-            unit: exercise.unit,
+            unit: item.unit,
+            source: item.source,
+            equipmentName: item.equipmentNameZh,
             sets: [
                 TemplateSetItem(setNumber: 1, weight: 0, reps: 10, setType: .normal),
                 TemplateSetItem(setNumber: 2, weight: 0, reps: 10, setType: .normal),
@@ -268,6 +274,8 @@ struct TemplateExerciseItem: Identifiable {
     let bodyPart: BodyPart
     var sortOrder: Int
     let unit: ExerciseUnit
+    let source: ExerciseCatalogSource
+    let equipmentName: String?
     var sets: [TemplateSetItem]
 }
 
@@ -302,9 +310,24 @@ struct TemplateExerciseRow: View {
                         Text(exercise.exerciseName)
                             .font(Theme.Fonts.headline)
                             .foregroundColor(Theme.Colors.textPrimary)
-                        Text(exercise.bodyPart.displayName)
-                            .font(Theme.Fonts.caption)
-                            .foregroundColor(exercise.bodyPart.themeColor)
+                        HStack(spacing: Theme.Spacing.xs) {
+                            Text(exercise.bodyPart.displayName)
+                                .font(Theme.Fonts.caption)
+                                .foregroundColor(exercise.bodyPart.themeColor)
+                            Text(sourceTitle(exercise.source))
+                                .font(.system(size: 10))
+                                .foregroundColor(Theme.Colors.accent)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Theme.Colors.accent.opacity(0.2))
+                                .cornerRadius(4)
+                            if let equipmentName = exercise.equipmentName {
+                                Text(equipmentName)
+                                    .font(Theme.Fonts.caption)
+                                    .foregroundColor(Theme.Colors.textMuted)
+                                    .lineLimit(1)
+                            }
+                        }
                     }
 
                     Spacer()
@@ -373,6 +396,14 @@ struct TemplateExerciseRow: View {
         }
         .onChange(of: localSets) { newValue in
             onUpdateSets(newValue)
+        }
+    }
+
+    private func sourceTitle(_ source: ExerciseCatalogSource) -> String {
+        switch source {
+        case .db: return "内置"
+        case .user: return "我的动作"
+        case .json: return "器械教学"
         }
     }
 }
