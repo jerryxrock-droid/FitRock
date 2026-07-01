@@ -17,8 +17,14 @@ struct FitRockApp: App {
                     if ProcessInfo.processInfo.arguments.contains("--reset-ui-data") {
                         UserDefaults.standard.removeObject(forKey: "fitrock.activeTrainingPlan")
                     }
-                    appState.checkForUnfinishedWorkout()
-                    appState.showOnboardingIfNeeded()
+                    appState.prepareForLaunch()
+                }
+                .fullScreenCover(isPresented: $appState.showConsentGate) {
+                    PrivacyConsentView(
+                        onAccept: {
+                            appState.acceptPrivacyConsent()
+                        }
+                    )
                 }
                 .fullScreenCover(isPresented: $appState.showOnboarding) {
                     OnboardingView(
@@ -81,16 +87,25 @@ final class AppState: ObservableObject {
     @Published var selectedTab = 0
     @Published var workoutStartedExternally = false
     @Published var showOnboarding = false
+    @Published var showConsentGate = false
 
     private let db: WorkoutRepository
     private let onboardingStore: OnboardingStateStore
+    private let privacyConsentStore: PrivacyConsentStore
 
     init(
         db: WorkoutRepository = DatabaseManager.shared,
-        onboardingStore: OnboardingStateStore = .shared
+        onboardingStore: OnboardingStateStore = .shared,
+        privacyConsentStore: PrivacyConsentStore = .shared
     ) {
         self.db = db
         self.onboardingStore = onboardingStore
+        self.privacyConsentStore = privacyConsentStore
+    }
+
+    func prepareForLaunch(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        checkForUnfinishedWorkout()
+        showConsentOrOnboardingIfNeeded(arguments: arguments)
     }
 
     func checkForUnfinishedWorkout() {
@@ -128,8 +143,25 @@ final class AppState: ObservableObject {
         clearRecoveryState()
     }
 
-    func showOnboardingIfNeeded() {
-        let arguments = ProcessInfo.processInfo.arguments
+    func showConsentOrOnboardingIfNeeded(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        if arguments.contains("--ui-testing"), arguments.contains("--reset-privacy-consent") {
+            privacyConsentStore.resetForTesting()
+        }
+        if arguments.contains("--ui-testing"), arguments.contains("--accept-privacy-consent") {
+            privacyConsentStore.accept()
+        }
+
+        guard privacyConsentStore.hasAcceptedCurrentConsent else {
+            showConsentGate = true
+            showOnboarding = false
+            return
+        }
+
+        showConsentGate = false
+        showOnboardingIfNeeded(arguments: arguments)
+    }
+
+    func showOnboardingIfNeeded(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if arguments.contains("--skip-onboarding") {
             onboardingStore.markSeen()
             showOnboarding = false
@@ -152,6 +184,12 @@ final class AppState: ObservableObject {
 
     func replayOnboarding() {
         showOnboarding = true
+    }
+
+    func acceptPrivacyConsent() {
+        privacyConsentStore.accept()
+        showConsentGate = false
+        showOnboardingIfNeeded()
     }
 
     private func clearRecoveryState() {

@@ -1,6 +1,6 @@
 name: FitRock
 options:
-  bundleIdPrefix: com.fitrock
+  bundleIdPrefix: com.JerryX
   deploymentTarget:
     iOS: "16.0"
   xcodeVersion: "15.0"
@@ -8,7 +8,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    TARGETED_DEVICE_FAMILY: "1"
+    TARGETED_DEVICE_FAMILY: "1,2"
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
@@ -37,9 +37,10 @@ targets:
       - package: SQLite
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.fitrock.FitRock
+        PRODUCT_BUNDLE_IDENTIFIER: com.JerryX.FitRock
+        DEVELOPMENT_TEAM: 9W9DQ54BVY
         INFOPLIST_KEY_CFBundleDisplayName: FitRock
-        INFOPLIST_KEY_NSHealthShareUsageDescription: FitRock 会在你授权后读取体重、心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。
+        INFOPLIST_KEY_NSHealthShareUsageDescription: FitRock 会在你授权后读取体重、心率、静息心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

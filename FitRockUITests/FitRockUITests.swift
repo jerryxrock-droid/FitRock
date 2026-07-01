@@ -6,14 +6,32 @@ final class FitRockUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--skip-onboarding", "--reset-ui-data"]
+        app.launchArguments = ["--ui-testing", "--accept-privacy-consent", "--skip-onboarding", "--reset-ui-data"]
         app.launch()
+    }
+
+    func testFirstLaunchRequiresPrivacyConsentBeforeOnboarding() {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-onboarding", "--reset-ui-data", "--reset-privacy-consent"]
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["隐私政策与训练免责声明"].waitForExistence(timeout: 5))
+        let continueButton = app.buttons["同意并继续"]
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
+        XCTAssertFalse(continueButton.isEnabled)
+
+        app.buttons["我已阅读并同意隐私政策和训练免责声明"].tap()
+        XCTAssertTrue(continueButton.isEnabled)
+        continueButton.tap()
+
+        XCTAssertTrue(app.staticTexts["快速记录每一组"].waitForExistence(timeout: 5))
     }
 
     func testFirstLaunchOnboardingStartsFirstWorkout() {
         app.terminate()
         app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--reset-onboarding", "--reset-ui-data"]
+        app.launchArguments = ["--ui-testing", "--accept-privacy-consent", "--reset-onboarding", "--reset-ui-data"]
         app.launch()
 
         XCTAssertTrue(app.staticTexts["快速记录每一组"].waitForExistence(timeout: 5))
@@ -37,6 +55,11 @@ final class FitRockUITests: XCTestCase {
 
     func testSettingsShowsPrivacyAndDisclaimer() {
         app.tabBars.buttons["统计"].tap()
+        app.navigationBars.buttons["设置"].tap()
+
+        waitAndTap("重新查看隐私条款")
+        XCTAssertTrue(app.staticTexts["隐私政策与训练免责声明"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["查看完整隐私政策"].waitForExistence(timeout: 5))
         app.navigationBars.buttons["设置"].tap()
 
         waitAndTap("隐私与健康数据")

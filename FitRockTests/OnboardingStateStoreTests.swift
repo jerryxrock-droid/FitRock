@@ -30,6 +30,54 @@ final class OnboardingStateStoreTests: XCTestCase {
         XCTAssertTrue(appState.showOnboarding)
         XCTAssertFalse(repository.didDeleteWorkout)
     }
+
+    func testPrivacyConsentDefaultsToNotAccepted() {
+        let defaults = UserDefaults(suiteName: "PrivacyConsentStoreTests.defaults")!
+        defaults.removePersistentDomain(forName: "PrivacyConsentStoreTests.defaults")
+        let store = PrivacyConsentStore(defaults: defaults)
+
+        XCTAssertFalse(store.hasAcceptedCurrentConsent)
+    }
+
+    func testPrivacyConsentPersistsVersionAndDate() throws {
+        let defaults = UserDefaults(suiteName: "PrivacyConsentStoreTests.persist")!
+        defaults.removePersistentDomain(forName: "PrivacyConsentStoreTests.persist")
+        let acceptedAt = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = PrivacyConsentStore(defaults: defaults)
+
+        store.accept(date: acceptedAt)
+
+        let reloaded = PrivacyConsentStore(defaults: defaults)
+        XCTAssertTrue(reloaded.hasAcceptedCurrentConsent)
+        XCTAssertEqual(reloaded.acceptedVersion, PrivacyConsentStore.currentVersion)
+        XCTAssertEqual(reloaded.acceptedDate, acceptedAt)
+    }
+
+    func testPrivacyConsentVersionMismatchRequiresConfirmationAgain() {
+        let defaults = UserDefaults(suiteName: "PrivacyConsentStoreTests.version")!
+        defaults.removePersistentDomain(forName: "PrivacyConsentStoreTests.version")
+        defaults.set(true, forKey: "hasAcceptedPrivacyConsent")
+        defaults.set("legacy", forKey: "acceptedPrivacyConsentVersion")
+        let store = PrivacyConsentStore(defaults: defaults)
+
+        XCTAssertFalse(store.hasAcceptedCurrentConsent)
+    }
+
+    func testPrivacyConsentReplayDoesNotTouchWorkoutData() {
+        let repository = MockOnboardingWorkoutRepository()
+        let defaults = UserDefaults(suiteName: "PrivacyConsentStoreTests.replay")!
+        defaults.removePersistentDomain(forName: "PrivacyConsentStoreTests.replay")
+        let appState = AppState(
+            db: repository,
+            onboardingStore: OnboardingStateStore(defaults: defaults, key: "seen"),
+            privacyConsentStore: PrivacyConsentStore(defaults: defaults)
+        )
+
+        appState.showConsentGate = true
+
+        XCTAssertTrue(appState.showConsentGate)
+        XCTAssertFalse(repository.didDeleteWorkout)
+    }
 }
 
 private final class MockOnboardingWorkoutRepository: WorkoutRepository {

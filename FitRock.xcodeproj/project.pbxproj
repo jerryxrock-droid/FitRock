@@ -3,13 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0409AF088E68B7F452EDDD05 /* HealthKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E2870EB55AD9A2942779B /* HealthKitServiceTests.swift */; };
 		06EF6A27E31C01D116DFD55D /* LocalExerciseDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868CEF97C45F23117DD87E51 /* LocalExerciseDataService.swift */; };
-		08491F807479F11762B760D2 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E33D37FF50191201CAED5F9C /* README.md */; };
 		09C45350C02C7FF86CE3ED5B /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B0A1D93FD4F6E148D8D5373 /* Workout.swift */; };
 		0A8107EFB0117C8F8F532FAC /* TrainingPlanRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F165D71CBA0F17C1F45353 /* TrainingPlanRepository.swift */; };
 		0ACF30C9B1F0295CF265784B /* MaleFrontPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4846B397B210457A6784BC /* MaleFrontPaths.swift */; };
@@ -171,7 +170,7 @@
 		17BA854EF7B85829F2FA1A92 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		199F09BD26B612C5742E9689 /* FitRockUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitRockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1ACEBCB4135008FA9611B3A9 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
-		1BCE37551F30A6655583B8F4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1BCE37551F30A6655583B8F4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1D2BF3CF41EDE07305410C69 /* ExerciseCatalogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalogItem.swift; sourceTree = "<group>"; };
 		1E988FCD9352ED370591489D /* ExerciseTeachingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTeachingData.swift; sourceTree = "<group>"; };
 		20C567412A3F289BE5B489B1 /* MuscleSide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleSide.swift; sourceTree = "<group>"; };
@@ -200,7 +199,7 @@
 		54F165D71CBA0F17C1F45353 /* TrainingPlanRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanRepository.swift; sourceTree = "<group>"; };
 		5683FBD76F363A294527BC1B /* ExerciseSearchScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSearchScorer.swift; sourceTree = "<group>"; };
 		570AD4F07730DEFF1EB0699C /* ExerciseResourceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseResourceValidator.swift; sourceTree = "<group>"; };
-		58688B5A5C9593624135E7E5 /* FitRock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitRock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58688B5A5C9593624135E7E5 /* FitRock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitRock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A17BB066F90C6AF65D520B0 /* TrainingPlanCompletionMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanCompletionMatcher.swift; sourceTree = "<group>"; };
 		5A304A7EEFDF81C76098CEF7 /* PathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathBuilder.swift; sourceTree = "<group>"; };
 		5C6920727E2B891F1504C94F /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
@@ -267,7 +266,7 @@
 		CFE693F48DACA601017FFF56 /* TrainingPlanExecutionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanExecutionService.swift; sourceTree = "<group>"; };
 		CFF7605B02DD46EFC10CAC79 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D7C33F14877EC7AA83A352FD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		D7E6D8923F6CDEC6C5DF77A2 /* FitRock_Icon.svg */ = {isa = PBXFileReference; path = FitRock_Icon.svg; sourceTree = "<group>"; };
+		D7E6D8923F6CDEC6C5DF77A2 /* FitRock_Icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = FitRock_Icon.svg; sourceTree = "<group>"; };
 		D8120C7B7674B96879AEB37D /* ExerciseCatalogServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalogServiceTests.swift; sourceTree = "<group>"; };
 		D9A767AD0FBFA24267914210 /* WorkoutExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExercise.swift; sourceTree = "<group>"; };
 		DA05E1487B954249FDAEF86D /* WorkoutTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimer.swift; sourceTree = "<group>"; };
@@ -778,9 +777,8 @@
 			mainGroup = B7F506ED4F116C2D8E09E931;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -803,7 +801,6 @@
 				C3139895F3B4C60220734111 /* FitRock_Icon_Preview.png in Resources */,
 				C538A399CFEF7D450A9C5BB4 /* Localizable.strings in Resources */,
 				B3CEFD1CE362034849414C70 /* PrivacyInfo.xcprivacy in Resources */,
-				08491F807479F11762B760D2 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1129,15 +1126,19 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FitRock/FitRock.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9W9DQ54BVY;
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率、静息心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitrock.FitRock;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JerryX.FitRock;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1150,15 +1151,19 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FitRock/FitRock.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9W9DQ54BVY;
 				INFOPLIST_KEY_CFBundleDisplayName = FitRock;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "FitRock 会在你授权后读取体重、心率、静息心率和活动能量，仅用于本机生成训练计划建议和统计参考；拒绝授权不影响记录训练。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitrock.FitRock;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JerryX.FitRock;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1267,7 +1272,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+		059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
 			requirement = {
@@ -1280,7 +1285,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0B27030F60CAEAB693832E83 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			package = 059B9E7E3AADC6869E48172B /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */

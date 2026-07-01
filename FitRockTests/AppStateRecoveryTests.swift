@@ -40,6 +40,71 @@ final class AppStateRecoveryTests: XCTestCase {
         XCTAssertTrue(appState.shouldResumeWorkout)
         XCTAssertEqual(appState.selectedTab, 1)
     }
+
+    func testLaunchShowsConsentBeforeOnboardingWhenPrivacyNotAccepted() {
+        let defaults = UserDefaults(suiteName: "AppStateTests.consentFirst")!
+        defaults.removePersistentDomain(forName: "AppStateTests.consentFirst")
+        let appState = AppState(
+            db: MockWorkoutRepository(),
+            onboardingStore: OnboardingStateStore(defaults: defaults, key: "seen"),
+            privacyConsentStore: PrivacyConsentStore(defaults: defaults)
+        )
+
+        appState.showConsentOrOnboardingIfNeeded(arguments: [])
+
+        XCTAssertTrue(appState.showConsentGate)
+        XCTAssertFalse(appState.showOnboarding)
+    }
+
+    func testAcceptingConsentThenShowsOnboardingForFirstTimeUser() {
+        let defaults = UserDefaults(suiteName: "AppStateTests.acceptThenOnboarding")!
+        defaults.removePersistentDomain(forName: "AppStateTests.acceptThenOnboarding")
+        let appState = AppState(
+            db: MockWorkoutRepository(),
+            onboardingStore: OnboardingStateStore(defaults: defaults, key: "seen"),
+            privacyConsentStore: PrivacyConsentStore(defaults: defaults)
+        )
+
+        appState.showConsentOrOnboardingIfNeeded(arguments: [])
+        appState.acceptPrivacyConsent()
+
+        XCTAssertFalse(appState.showConsentGate)
+        XCTAssertTrue(appState.showOnboarding)
+    }
+
+    func testLaunchSkipsAllGatesWhenConsentAndOnboardingAlreadyCompleted() {
+        let defaults = UserDefaults(suiteName: "AppStateTests.completed")!
+        defaults.removePersistentDomain(forName: "AppStateTests.completed")
+        OnboardingStateStore(defaults: defaults, key: "seen").markSeen()
+        PrivacyConsentStore(defaults: defaults).accept()
+        let appState = AppState(
+            db: MockWorkoutRepository(),
+            onboardingStore: OnboardingStateStore(defaults: defaults, key: "seen"),
+            privacyConsentStore: PrivacyConsentStore(defaults: defaults)
+        )
+
+        appState.showConsentOrOnboardingIfNeeded(arguments: [])
+
+        XCTAssertFalse(appState.showConsentGate)
+        XCTAssertFalse(appState.showOnboarding)
+    }
+
+    func testAcceptPrivacyConsentLaunchArgumentRequiresUITestingFlag() {
+        let defaults = UserDefaults(suiteName: "AppStateTests.uiConsent")!
+        defaults.removePersistentDomain(forName: "AppStateTests.uiConsent")
+        let appState = AppState(
+            db: MockWorkoutRepository(),
+            onboardingStore: OnboardingStateStore(defaults: defaults, key: "seen"),
+            privacyConsentStore: PrivacyConsentStore(defaults: defaults)
+        )
+
+        appState.showConsentOrOnboardingIfNeeded(arguments: ["--accept-privacy-consent"])
+        XCTAssertTrue(appState.showConsentGate)
+
+        appState.showConsentOrOnboardingIfNeeded(arguments: ["--ui-testing", "--accept-privacy-consent", "--skip-onboarding"])
+        XCTAssertFalse(appState.showConsentGate)
+        XCTAssertFalse(appState.showOnboarding)
+    }
 }
 
 private final class MockWorkoutRepository: WorkoutRepository {
